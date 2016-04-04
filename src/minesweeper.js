@@ -35,7 +35,6 @@ const Minesweeper = () => ({
     mines: 10,
     minesRemaining: 10,
     blocks: Map(),
-    firstClick: true,
     status: "reading",
     timePass: 0,
 
@@ -45,12 +44,16 @@ const Minesweeper = () => ({
         return this._eventEmitter.on(event, callback);
     },
 
-    init: function() {
+    init: function(rows = 9, cols = 9, mines = 10) {
         // initialize variables
-        this.blocks = Map();
+        this.rows = rows;
+        this.cols = cols;
+        this.mines = mines;
         this.minesRemaining = this.mines;
-        this.timePass = 0;
+        this.blocks = Map();
         this.status = "ready";
+        this.timePass = 0;
+        clearInterval(this._timer);
         this._eventEmitter.emit("statuschanged", this.status);
 
         // initialize blocks

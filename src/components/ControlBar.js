@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Radium from 'radium';
 
 const style = {
 	display: "flex",
@@ -25,7 +26,12 @@ const btnStyle = {
 	width: "36px",
 	lineHeight: "26px",
 	boxSizing: "border-box",
-	textAlign: "center"
+	textAlign: "center",
+	transition: "background-color 0.2s ease-out",
+
+	":hover": {
+		backgroundColor: "#F0F0F0"
+	}
 };
 
 const textStyle = {
@@ -35,19 +41,19 @@ const textStyle = {
 	letterSpacing: "0.1em"
 };
 
-class TimePass extends Component {
+const TimePass = Radium(React.createClass({
 	componentDidMount() {
 		setInterval(() => {
 			this.props.updateTime();
 		}, 1000);
-	}
+	},
 
 	render() {
 		return (
 			<p style={textStyle} className="time-pass">{this.props.timePass}</p>
 		);
 	}
-}
+}));
 
 const ControlBar = ({ minesRemaining, display, text, restartGame, timePass, on, updateTime }) => (
 	<div style={style}>
@@ -58,4 +64,4 @@ const ControlBar = ({ minesRemaining, display, text, restartGame, timePass, on, 
 	</div>
 );
 
-export default ControlBar;
+export default Radium(ControlBar);

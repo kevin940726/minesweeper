@@ -3,6 +3,7 @@ import Grid from '../containers/Grid';
 import Popup from '../containers/Popup';
 import ControlBar from '../containers/ControlBar';
 import { BlockRecord } from '../minesweeper';
+import Radium from 'radium';
 
 const style = {
 	display: "block",
@@ -22,7 +23,7 @@ const rowStyle = {
 	flexDirection: "row"
 };
 
-const Row = ({ cols, row }) => (
+let Row = ({ cols, row }) => (
 	<div style={rowStyle}>
 		{new Array(cols).fill(0).map((cur, col) => {
 			return (
@@ -35,6 +36,7 @@ const Row = ({ cols, row }) => (
 		})}
 	</div>
 );
+Row = Radium(Row);
 
 const Weeper = ({ rows, cols }) => (
 	<div style={style}>
@@ -46,4 +48,4 @@ const Weeper = ({ rows, cols }) => (
 	</div>
 );
 
-export default Weeper;
+export default Radium(Weeper);

@@ -17,7 +17,7 @@ const minesRemainingSelector = createSelector(
 
 const timePassSelector = createSelector(
 	state => state.mw.timePass,
-	timePass => "0000".substring(0, 4 - timePass.toString().length) + timePass.toString()
+	timePass => "000".substring(0, 3 - timePass.toString().length) + timePass.toString()
 );
 
 const mapStateToProps = (state) => ({
