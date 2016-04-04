@@ -70,7 +70,7 @@ const Minesweeper = () => ({
         randomNumberGenerator({ end: this.rows * this.cols, number: this.mines })
             .forEach(index => {
                 const blockRecord = new BlockRecord({
-                    row: Math.floor(index / this.rows),
+                    row: Math.floor(index / this.cols),
                     col: index % this.cols
                 });
 
@@ -138,7 +138,7 @@ const Minesweeper = () => ({
 
         if (this.status === "ready") {
             if (!this.firstCheck(blockRecord)) {
-                this.init();
+                this.init(this.rows, this.cols, this.mines);
                 this.clickOn(blockRecord);
                 return this.blocks;
             }

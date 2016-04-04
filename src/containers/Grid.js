@@ -2,12 +2,19 @@ import { connect } from 'react-redux';
 import grid from '../components/Grid';
 import { BlockRecord } from '../minesweeper';
 import { handleClick, handleFlag } from '../actions';
+import { createSelector } from 'reselect';
 
-const mapStateToProps = (state, ownProps) => ({
-	block: state.mw.blocks.get(new BlockRecord({
+const blockSelector = createSelector(
+	state => state.mw.blocks,
+	(state, ownProps) => ownProps,
+	(blocks, ownProps) => blocks.get(new BlockRecord({
 		row: ownProps.row,
 		col: ownProps.col
 	}))
+);
+
+const mapStateToProps = (state, ownProps) => ({
+	block: blockSelector(state, ownProps)
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,13 +1,14 @@
 import React from 'react';
 import Grid from '../containers/Grid';
-import Popup from '../containers/Popup';
 import ControlBar from '../containers/ControlBar';
+import ConfigBar from '../containers/ConfigBar';
+import ConfigPanel from '../containers/ConfigPanel';
 import { BlockRecord } from '../minesweeper';
 import Radium from 'radium';
 
 const style = {
 	display: "block",
-	position: "fixed",
+	position: "absolute",
 	left: "50%",
 	top: "50%",
 	transform: "translate(-50%, -50%)",
@@ -38,13 +39,14 @@ let Row = ({ cols, row }) => (
 );
 Row = Radium(Row);
 
-const Weeper = ({ rows, cols }) => (
+const Weeper = ({ rows, cols, showPanel }) => (
 	<div style={style}>
 		<ControlBar />
 		{new Array(rows).fill(0).map((cur, row) => (
 			<Row key={"row" + row} cols={cols} row={row} />
 		))}
-		{/*<Popup />*/}
+		<ConfigBar />
+		{showPanel && (<ConfigPanel />)}
 	</div>
 );
 

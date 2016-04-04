@@ -24,7 +24,7 @@ const mapStateToProps = (state) => ({
 	minesRemaining: minesRemainingSelector(state),
 	text: textSelector(state),
 	timePass: timePassSelector(state),
-	on: state.mw.on
+	mw: state.mw
 });
 
 const mapDispatchToProps = (dispatch) => ({

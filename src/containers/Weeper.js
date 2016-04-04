@@ -3,9 +3,9 @@ import weeper from '../components/Weeper';
 import { handleClick, handleFlag } from '../actions';
 
 const mapStateToProps = (state) => ({
-	minesRemaining: state.mw.minesRemaining,
 	rows: state.mw.rows,
-	cols: state.mw.cols
+	cols: state.mw.cols,
+	showPanel: state.config.show
 });
 
 const Weeper = connect(mapStateToProps)(weeper);

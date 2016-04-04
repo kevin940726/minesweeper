@@ -37,12 +37,28 @@ const reducers = handleActions({
 
 	RESTART_GAME: (state) => ({
 		...state,
-		mw: state.mw.init()
+		mw: state.mw.init(state.config.rows, state.config.cols, state.config.mines)
 	}),
 
 	UPDATE_TIME: (state, action) => ({
 		...state,
 		timePass: state.mw.timePass
+	}),
+
+	SAVE_CONFIG: (state, action) => ({
+		...state,
+		config: {
+			...state.config,
+			[action.payload.target]: action.payload.value
+		}
+	}),
+
+	TOGGLE_PANEL: (state) => ({
+		...state,
+		config: {
+			...state.config,
+			show: !state.config.show
+		}
 	})
 });
 
