@@ -1,0 +1,8 @@
+{
+  "generator-react-webpack": {
+    "appName": "minesweeper",
+    "style": "scss",
+    "postcss": true,
+    "generatedWithVersion": 3
+  }
+}
