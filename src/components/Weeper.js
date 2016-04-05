@@ -7,25 +7,27 @@ import { BlockRecord } from '../minesweeper';
 import Radium from 'radium';
 
 const style = {
-	display: "block",
-	position: "absolute",
-	left: "50%",
-	top: "50%",
-	transform: "translate(-50%, -50%)",
-	padding: "30px",
-	boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
-	backgroundColor: "#FFF"
-};
-
-const rowStyle = {
-	display: "flex",
-	justifyContent: "center",
-	alignItems: "center",
-	flexDirection: "row"
+	base: {
+		display: "block",
+		position: "absolute",
+		left: "50%",
+		top: "50%",
+		transform: "translate(-50%, -50%)",
+		padding: "20px 30px",
+		boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
+		backgroundColor: "#FFF"
+	},
+	row: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		flexDirection: "row",
+		backgroundColor: "#FFF"
+	}
 };
 
 let Row = ({ cols, row }) => (
-	<div style={rowStyle}>
+	<div style={style.row}>
 		{new Array(cols).fill(0).map((cur, col) => {
 			return (
 				<Grid key={`${row}${col}`}
@@ -39,14 +41,14 @@ let Row = ({ cols, row }) => (
 );
 Row = Radium(Row);
 
-const Weeper = ({ rows, cols, showPanel }) => (
-	<div style={style}>
+const Weeper = ({ rows, cols }) => (
+	<div style={style.base}>
 		<ControlBar />
 		{new Array(rows).fill(0).map((cur, row) => (
 			<Row key={"row" + row} cols={cols} row={row} />
 		))}
 		<ConfigBar />
-		{showPanel && (<ConfigPanel />)}
+		<ConfigPanel />
 	</div>
 );
 

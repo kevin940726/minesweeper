@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
 import Radium, { keyframes } from 'radium';
-
-const slideUp = keyframes({
-	"0%": {
-		transform: "translateY(10px)"
-	},
-	"100%": {
-		transform: "translateY(0px)"
-	}
-});
+import Sticky from 'react-sticky-state';
 
 const giggle = keyframes({
 	"0%": {
@@ -61,7 +53,6 @@ const style = {
 		textAlign: "center",
 		transition: "background-color 0.2s ease-out",
 		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
-		// animation: `${slideUp} 1s ease-out forwards`,
 
 		":hover": {
 			backgroundColor: "#F0F0F0"

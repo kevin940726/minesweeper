@@ -9,7 +9,7 @@ const style = {
 		alignItems: "center",
 		justifyContent: "center",
 		fontSize: "20px",
-		margin: "5px",
+		margin: "4px",
 		boxSizing: "border-box",
 		lineHeight: "28px", // fuck you, waste 4 hours on this shit...
 		cursor: "default",
@@ -25,6 +25,9 @@ const style = {
 		":hover": {
 			backgroundColor: "#F5F5F5"
 		}
+	},
+	emoji: {
+		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif"
 	}
 };
 
@@ -39,9 +42,9 @@ const Grid = ({ row, col, block, handleClick, handleFlag }) => (
 			block.hidden && style.hidden
 		]}
 	>
-		{block.flag ? "🚩" :
+		{block.flag ? (<span style={style.emoji}>🚩</span>) :
 			(block.hidden ? " " :
-				(block.type === "mine" ? "💣" :
+				(block.type === "mine" ? (<span style={style.emoji}>💣</span>) :
 					(block.mines || " ")
 				)
 			)}

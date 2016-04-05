@@ -37,6 +37,8 @@ const Minesweeper = () => ({
     blocks: Map(),
     status: "reading",
     timePass: 0,
+    mode: "regular",
+    flagMode: false,
 
     _timer: null,
     _eventEmitter: new EventEmitter(),
@@ -44,7 +46,7 @@ const Minesweeper = () => ({
         return this._eventEmitter.on(event, callback);
     },
 
-    init: function(rows = 9, cols = 9, mines = 10) {
+    init: function(rows = 9, cols = 9, mines = 10, flagMode = true) {
         // initialize variables
         this.rows = rows;
         this.cols = cols;
@@ -53,6 +55,8 @@ const Minesweeper = () => ({
         this.blocks = Map();
         this.status = "ready";
         this.timePass = 0;
+        this.mode = "regular";
+        this.flagMode = flagMode;
         clearInterval(this._timer);
         this._eventEmitter.emit("statuschanged", this.status);
 
@@ -115,6 +119,7 @@ const Minesweeper = () => ({
     revealBlock: function(blockRecord) {
         const block = this.blocks.get(blockRecord);
 
+        // click on normal hidden block
         if (block.type === "normal") {
             this.blocks = this.blocks.update(
                 blockRecord,
@@ -128,34 +133,6 @@ const Minesweeper = () => ({
                         this.revealBlock(record);
                     });
             }
-        }
-
-        return this;
-    },
-
-    clickOn: function(blockRecord) {
-        const block = this.blocks.get(blockRecord);
-
-        if (this.status === "ready") {
-            if (!this.firstCheck(blockRecord)) {
-                this.init(this.rows, this.cols, this.mines);
-                this.clickOn(blockRecord);
-                return this.blocks;
-            }
-
-            this.status = "playing";
-            this._eventEmitter.emit("statuschanged", this.status);
-            this._timer = setInterval(() => {
-                if (this.status === "playing") {
-                    this.timePass += 1;
-                    this._eventEmitter.emit("timeupdated", this.timePass);
-                }
-            }, 1000);
-        }
-
-        // click on flag
-        if (block.flag) {
-            // do nothing
         }
         // click on mine
         else if (block.type === "mine") {
@@ -173,6 +150,36 @@ const Minesweeper = () => ({
                         b => b.set("hidden", false)
                     );
                 });
+        }
+
+        return this;
+    },
+
+    clickOn: function(blockRecord) {
+        const block = this.blocks.get(blockRecord);
+
+        // first click, continuously init while click on white block.
+        if (this.status === "ready") {
+            if (!this.firstCheck(blockRecord)) {
+                this.init(this.rows, this.cols, this.mines, this.flagMode);
+                this.clickOn(blockRecord);
+                return this.blocks;
+            }
+
+            this.status = "playing";
+            this.mode = this.flagMode ? "quick" : "regular";
+            this._eventEmitter.emit("statuschanged", this.status);
+            this._timer = setInterval(() => {
+                if (this.status === "playing") {
+                    this.timePass += 1;
+                    this._eventEmitter.emit("timeupdated", this.timePass);
+                }
+            }, 1000);
+        }
+
+        // click on flag
+        if (block.flag) {
+            // do nothing
         }
         // click on hidden block
         else if (block.hidden) {
@@ -228,6 +235,25 @@ const Minesweeper = () => ({
         }
 
         this.checkGame();
+        return this;
+    },
+
+    singleClick: function(blockRecord) {
+        if (this.mode === "regular") {
+            this.clickOn(blockRecord);
+        }
+        else if (this.mode === "quick") {
+            this.setFlag(blockRecord);
+        }
+        return this;
+    },
+    rightClick: function(blockRecord) {
+        if (this.mode === "regular") {
+            this.setFlag(blockRecord);
+        }
+        else if (this.mode === "quick") {
+            this.clickOn(blockRecord);
+        }
         return this;
     },
 

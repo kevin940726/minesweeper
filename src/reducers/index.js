@@ -3,12 +3,7 @@ import { BlockRecord, Block } from '../minesweeper';
 
 const reducers = handleActions({
 	HANDLE_CLICK: (state, action) => {
-		if (state.mw.status === "ready") {
-			state.mw.clickOn(action.payload);
-		}
-		else if (state.mw.status === "playing") {
-			state.mw.setFlag(action.payload);
-		}
+		state.mw.singleClick(action.payload);
 
 		return {
 			...state,
@@ -17,12 +12,7 @@ const reducers = handleActions({
 	},
 
 	HANDLE_FLAG: (state, action) => {
-		if (state.mw.status === "playing") {
-			state.mw.clickOn(action.payload);
-		}
-		else if (state.mw.status === "ready") {
-			state.mw.setFlag(action.payload);
-		}
+		state.mw.rightClick(action.payload);
 
 		return {
 			...state,
@@ -30,14 +20,18 @@ const reducers = handleActions({
 		};
 	},
 
-	CHANGE_MODE: (state, action) => ({
-		...state,
-		mode: action.payload
-	}),
+	TOGGLE_MODE: (state, action) => {
+		state.mw.mode = state.mw.mode === "regular" ? "quick" : "regular";
+
+		return {
+			...state,
+			mw: state.mw
+		};
+	},
 
 	RESTART_GAME: (state) => ({
 		...state,
-		mw: state.mw.init(state.config.rows, state.config.cols, state.config.mines)
+		mw: state.mw.init(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode)
 	}),
 
 	UPDATE_TIME: (state, action) => ({
@@ -59,7 +53,19 @@ const reducers = handleActions({
 			...state.config,
 			show: !state.config.show
 		}
-	})
+	}),
+
+	TOGGLE_FLAG_MODE: (state) => {
+		state.mw.flagMode = !state.mw.flagMode;
+		return {
+			...state,
+			mw: state.mw,
+			config: {
+				...state.config,
+				flagMode: state.mw.flagMode
+			}
+		};
+	}
 });
 
 export default reducers;

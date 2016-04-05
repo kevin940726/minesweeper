@@ -6,15 +6,24 @@ import reducer from './reducers';
 import App from './components/App';
 import { changeMode } from './actions';
 import { StyleRoot } from 'radium';
+import Cookie from 'cookies-js';
 
 import Minesweeper from './minesweeper';
 
+const config = {
+    show: false,
+    mode: false,
+    flagMode: Cookie.get("flagMode") === "true" || false,
+    rows: parseInt(Cookie.get("rows")) || 9,
+    cols: parseInt(Cookie.get("cols")) || 9,
+    mines: parseInt(Cookie.get("mines")) || 10
+};
+
 const mw = Minesweeper();
-mw.init();
+mw.init(config.rows, config.cols, config.mines, config.flagMode);
 
 const store = createStore(
-    reducer,
-    { mw: mw, mode: "desktop", config: { show: false, rows: 9, cols: 9, mines: 10 } },
+    reducer, { mw, config },
     window.devToolsExtension ? window.devToolsExtension() : f => f
 );
 
