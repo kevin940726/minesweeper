@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Radium, { keyframes } from 'radium';
 import Sticky from 'react-sticky-state';
+import hasFont from '../hasAppleColorEmoji';
 
 const giggle = keyframes({
 	"0%": {
@@ -65,7 +66,7 @@ const style = {
 		letterSpacing: "0.1em"
 	},
 	emoji: {
-		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif"
+		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
 	},
 	ani: {
 		animation: "x 1.5s ease-in-out infinite",
@@ -83,7 +84,7 @@ const TimePass = Radium(React.createClass({
 	render() {
 		return (
 			<p style={style.text} className="time-pass">
-				<span style={style.emoji}>⏱</span> {this.props.timePass}
+				<span className={hasFont() || "emoji s_clock4"} style={style.emoji}>⏱</span> {this.props.timePass}
 			</p>
 		);
 	}
@@ -92,12 +93,16 @@ const TimePass = Radium(React.createClass({
 const ControlBar = ({ minesRemaining, display, text, restartGame, timePass, mw, updateTime }) => (
 	<div style={style.base}>
 		<p style={style.text} className="mines-remaining">
-			<span style={style.emoji}>💣</span> {minesRemaining}
+			<span className={hasFont() || "emoji s_bomb"} style={style.emoji}>💣</span> {minesRemaining}
 		</p>
 		<a style={[
 			style.btn,
-			text === "😁" && style.ani
-		]} onChange={() => console.log("change")} onClick={restartGame} href="#">{text}</a>
+			text === "ready" && style.ani
+		]} onChange={() => console.log("change")} onClick={restartGame} href="#">
+			<span className={hasFont() || `emoji s_${text}`} style={style.emoji}>
+				{text === "grin" ? "😁" : (text === "cry" ? "😢" : "😊")}
+			</span>
+		</a>
 		<TimePass mw={mw} updateTime={updateTime} timePass={timePass} />
 	</div>
 );

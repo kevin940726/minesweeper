@@ -1,5 +1,6 @@
 import React from 'react';
 import Radium from 'radium';
+import hasFont from '../hasAppleColorEmoji';
 
 const style = {
 	base: {
@@ -38,7 +39,8 @@ const style = {
 		padding: "5px 10px",
 		fontSize: "16px",
 		boxSizing: "border-box",
-		textAlign: "center"
+		textAlign: "center",
+		color: "#000"
 	},
 	submit: {
 		padding: "5px 10px",
@@ -69,6 +71,7 @@ const style = {
 		lineHeight: "22px",
 		cursor: "pointer",
 		marginBottom: "0px",
+		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
 		":hover": {
 			backgroundColor:  "#EEE"
 		}
@@ -89,28 +92,28 @@ const ConfigPanel = ({ show, rows, cols, mines, flagMode, saveConfig, saveAllCon
 	<form style={[ style.base, show && style.show ]} onSubmit={togglePanel}>
 		<div style={style.upperGroup}>
 			<label key="flagModeLabel" style={[ style.label, style.checkbox ]}>
-				{flagMode ? "⚡" : "🐌"}
+				{flagMode ? (<span className={hasFont() || "emoji s_zap"}>⚡</span>) : <span className={hasFont() || "emoji s_snail"}>🐌</span>}
 				<input key="flagMode" type="checkbox" onChange={e => toggleFlagMode()} style={{display: 'none'}} checked={flagMode}></input>
 			</label>
 			<div style={style.line}></div>
-			<a key="beginner" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
-			<a key="intermediate" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
-			<a key="expert" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
+			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
+			<a className={hasFont() || "emoji s_herb"} key="intermediate" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
+			<a className={hasFont() || "emoji s_four_leaf_clover"} key="expert" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
 		</div>
-		<label style={style.label}>
+		<label className={hasFont() || "emoji s_left_right_arrow"} style={style.label}>
 			↔️
 			<input key="rows" type="tel" onChange={e => saveConfig(e, "rows")} style={style.input} value={rows} />
 		</label>
-		<label style={style.label}>
+		<label className={hasFont() || "emoji s_arrow_up_down"} style={style.label}>
 			↕️
 			<input key="cols" type="tel" onChange={e => saveConfig(e, "cols")} style={style.input} value={cols} />
 		</label>
-		<label style={style.label}>
+		<label className={hasFont() || "emoji s_bomb"} style={style.label}>
 			💣
 			<input key="mines" type="tel" onChange={e => saveConfig(e, "mines")} style={style.input} value={mines} />
 		</label>
 
-		<input style={style.submit} type="submit" value="👌" />
+		<input className={hasFont() || "emoji s_ok_hand"} style={style.submit} type="submit" value="👌" />
 	</form>
 );
 

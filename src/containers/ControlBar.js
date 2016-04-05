@@ -7,7 +7,7 @@ const statusSelector = state => state.mw.status;
 
 const textSelector = createSelector(
 	statusSelector,
-	status => status === "win" ? "😁" : (status === "lose" ? "😢" : "😊")
+	status => status === "win" ? "grin" : (status === "lose" ? "cry" : "blush")
 );
 
 const minesRemainingSelector = createSelector(

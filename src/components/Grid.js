@@ -1,5 +1,6 @@
 import React from 'react';
 import Radium from 'radium';
+import hasFont from '../hasAppleColorEmoji';
 
 const style = {
 	base: {
@@ -42,9 +43,9 @@ const Grid = ({ row, col, block, handleClick, handleFlag }) => (
 			block.hidden && style.hidden
 		]}
 	>
-		{block.flag ? (<span style={style.emoji}>🚩</span>) :
+		{block.flag ? (<span className={hasFont() || "emoji s_triangular_flag_on_post"} style={style.emoji}>🚩</span>) :
 			(block.hidden ? " " :
-				(block.type === "mine" ? (<span style={style.emoji}>💣</span>) :
+				(block.type === "mine" ? (<span className={hasFont() || "emoji s_bomb"} style={style.emoji}>💣</span>) :
 					(block.mines || " ")
 				)
 			)}

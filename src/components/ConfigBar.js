@@ -1,5 +1,6 @@
 import React from 'react';
 import Radium from 'radium';
+import hasFont from '../hasAppleColorEmoji';
 
 const style = {
 	base: {
@@ -31,9 +32,9 @@ const style = {
 
 const ConfigBar = ({ mw, mode, togglePanel, toggleMode }) => (
 	<div style={style.base}>
-		<a key="panel" style={style.btn} href="#" onClick={togglePanel}>⚙</a>
+		<a className={hasFont() || "emoji s_wrench"} key="panel" style={style.btn} href="#" onClick={togglePanel}>⚙</a>
 		<a key="mode"  style={style.btn} href="#" onClick={toggleMode}>
-			{mode === "regular" ? "🖱" : "🚩"}
+			{mode === "regular" ? (<span className={hasFont() || "emoji s_point_up_2"}>🖱</span>) : (<span className={hasFont() || "emoji s_triangular_flag_on_post"}>🚩</span>)}
 		</a>
 	</div>
 );
