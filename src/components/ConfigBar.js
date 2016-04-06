@@ -30,13 +30,20 @@ const style = {
 	},
 
 	sizeHack: {
-		backgroundPosition: "-21873px 0px"
+		width: "24px",
+		height: "24px",
+		margin: "3px",
+		transition: "background-color 0.2s ease-out, box-shadow 0.2s ease-out",
+		":hover": {
+			backgroundColor: "#EEE",
+			boxShadow: "0 0 3px #EEE"
+		}
 	}
 };
 
 const ConfigBar = ({ mw, mode, togglePanel, toggleMode }) => (
 	<div style={style.base}>
-		<a className={hasFont() || "emoji s_wrench"} key="panel" style={[ style.btn, hasFont() && style.sizeHack ]} href="#" onClick={togglePanel}>⚙</a>
+		<a className={hasFont() || "emoji s_wrench"} key="panel" style={[ style.btn, hasFont() || style.sizeHack ]} href="#" onClick={togglePanel}>⚙</a>
 		<a key="mode"  style={style.btn} href="#" onClick={toggleMode}>
 			{mode === "regular" ? (<span className={hasFont() || "emoji s_point_up_2"}>🖱</span>) : (<span className={hasFont() || "emoji s_triangular_flag_on_post"}>🚩</span>)}
 		</a>
