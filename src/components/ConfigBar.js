@@ -36,7 +36,7 @@ const style = {
 		transition: "background-color 0.2s ease-out, box-shadow 0.2s ease-out",
 		":hover": {
 			backgroundColor: "#EEE",
-			boxShadow: "0 0 3px #EEE"
+			boxShadow: "0 0 0 3px #EEE"
 		}
 	}
 };
