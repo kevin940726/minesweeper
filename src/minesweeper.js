@@ -239,20 +239,24 @@ const Minesweeper = () => ({
     },
 
     singleClick: function(blockRecord) {
-        if (this.mode === "regular") {
-            this.clickOn(blockRecord);
-        }
-        else if (this.mode === "quick") {
-            this.setFlag(blockRecord);
+        if (this.status !== "win" && this.status !== "lose") {
+            if (this.mode === "regular") {
+                this.clickOn(blockRecord);
+            }
+            else if (this.mode === "quick") {
+                this.setFlag(blockRecord);
+            }
         }
         return this;
     },
     rightClick: function(blockRecord) {
-        if (this.mode === "regular") {
-            this.setFlag(blockRecord);
-        }
-        else if (this.mode === "quick") {
-            this.clickOn(blockRecord);
+        if (this.status !== "win" && this.status !== "lose") {
+            if (this.mode === "regular") {
+                this.setFlag(blockRecord);
+            }
+            else if (this.mode === "quick") {
+                this.clickOn(blockRecord);
+            }
         }
         return this;
     },

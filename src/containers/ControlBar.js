@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import controlBar from '../components/ControlBar';
 import { createSelector } from 'reselect';
-import { restartGame, updateTime } from '../actions';
+import { restartGame, updateTime, updateHighScore } from '../actions';
 
 const statusSelector = state => state.mw.status;
 

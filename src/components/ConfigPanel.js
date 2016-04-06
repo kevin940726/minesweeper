@@ -28,11 +28,12 @@ const style = {
 		justifyContent: "space-between",
 		alignItems: "center",
 		marginBottom: "15px",
-		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif"
+		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
+		width: "100%"
 	},
 	input: {
 		flexBasis: "50px",
-		width: "100px",
+		width: "120px",
 		height: "30px",
 		marginLeft: "20px",
 		fontFamily: "'Roboto', sans-serif",
@@ -50,6 +51,7 @@ const style = {
 		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
 		fontSize: "20px",
 		cursor: "pointer",
+		width: "100%",
 		transition: "border 0.2s ease-out",
 		":hover": {
 			border: "1px solid #CCC"
@@ -85,6 +87,13 @@ const style = {
 	level: {
 		padding: "5px",
 		lineHeight: "20px"
+	},
+	levelHack: {
+		margin: "3px",
+		transition: "box-shadow 0.2s ease-out",
+		":hover": {
+			boxShadow: "0 0 3px #EEE"
+		}
 	}
 };
 
@@ -96,24 +105,26 @@ const ConfigPanel = ({ show, rows, cols, mines, flagMode, saveConfig, saveAllCon
 				<input key="flagMode" type="checkbox" onChange={e => toggleFlagMode()} style={{display: 'none'}} checked={flagMode}></input>
 			</label>
 			<div style={style.line}></div>
-			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
-			<a className={hasFont() || "emoji s_herb"} key="intermediate" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
-			<a className={hasFont() || "emoji s_four_leaf_clover"} key="expert" style={[ style.checkbox, style.level ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
+			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
+			<a className={hasFont() || "emoji s_herb"} key="intermediate" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
+			<a className={hasFont() || "emoji s_four_leaf_clover"} key="expert" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
 		</div>
-		<label className={hasFont() || "emoji s_left_right_arrow"} style={style.label}>
-			↔️
+		<label style={style.label}>
+			<span className={hasFont() || "emoji s_left_right_arrow"}>↔️</span>
 			<input key="rows" type="tel" onChange={e => saveConfig(e, "rows")} style={style.input} value={rows} />
 		</label>
-		<label className={hasFont() || "emoji s_arrow_up_down"} style={style.label}>
-			↕️
+		<label style={style.label}>
+			<span className={hasFont() || "emoji s_arrow_up_down"}>↕️</span>
 			<input key="cols" type="tel" onChange={e => saveConfig(e, "cols")} style={style.input} value={cols} />
 		</label>
-		<label className={hasFont() || "emoji s_bomb"} style={style.label}>
-			💣
+		<label style={style.label}>
+			<span className={hasFont() || "emoji s_bomb"}>💣</span>
 			<input key="mines" type="tel" onChange={e => saveConfig(e, "mines")} style={style.input} value={mines} />
 		</label>
 
-		<input className={hasFont() || "emoji s_ok_hand"} style={style.submit} type="submit" value="👌" />
+		<button style={style.submit} type="submit">
+			<span className={hasFont() || "emoji s_ok_hand"}>👌</span>
+		</button>
 	</form>
 );
 

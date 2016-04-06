@@ -66,7 +66,7 @@ const style = {
 		letterSpacing: "0.1em"
 	},
 	emoji: {
-		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
+		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif"
 	},
 	ani: {
 		animation: "x 1.5s ease-in-out infinite",
@@ -97,8 +97,8 @@ const ControlBar = ({ minesRemaining, display, text, restartGame, timePass, mw, 
 		</p>
 		<a style={[
 			style.btn,
-			text === "ready" && style.ani
-		]} onChange={() => console.log("change")} onClick={restartGame} href="#">
+			text === "grin" && style.ani
+		]} onClick={restartGame} href="#">
 			<span className={hasFont() || `emoji s_${text}`} style={style.emoji}>
 				{text === "grin" ? "😁" : (text === "cry" ? "😢" : "😊")}
 			</span>
