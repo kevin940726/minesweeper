@@ -86,14 +86,15 @@ const style = {
 	},
 	level: {
 		padding: "5px",
-		lineHeight: "20px",
-		width: "24px",
-		height: "24px"
+		lineHeight: "20px"
 	},
 	levelHack: {
+		width: "24px",
+		height: "24px",
 		margin: "3px",
-		transition: "box-shadow 0.2s ease-out",
+		transition: "background-color 0.2s ease-out, box-shadow 0.2s ease-out",
 		":hover": {
+			backgroundColor: "#EEE",
 			boxShadow: "0 0 3px #EEE"
 		}
 	}
@@ -107,9 +108,9 @@ const ConfigPanel = ({ show, rows, cols, mines, flagMode, saveConfig, saveAllCon
 				<input key="flagMode" type="checkbox" onChange={e => toggleFlagMode()} style={{display: 'none'}} checked={flagMode}></input>
 			</label>
 			<div style={style.line}></div>
-			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
-			<a className={hasFont() || "emoji s_herb"} key="intermediate" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
-			<a className={hasFont() || "emoji s_four_leaf_clover"} key="expert" style={[ style.checkbox, style.level, hasFont() && style.levelHack ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
+			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level, hasFont() || style.levelHack ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>
+			<a className={hasFont() || "emoji s_herb"} key="intermediate" style={[ style.checkbox, style.level, hasFont() || style.levelHack ]} onClick={e => saveAllConfig(16, 16, 40)}>☘</a>
+			<a className={hasFont() || "emoji s_four_leaf_clover"} key="expert" style={[ style.checkbox, style.level, hasFont() || style.levelHack ]} onClick={e => saveAllConfig(16, 30, 99)}>🍀</a>
 		</div>
 		<label style={style.label}>
 			<span className={hasFont() || "emoji s_left_right_arrow"}>↔️</span>
