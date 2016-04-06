@@ -86,7 +86,9 @@ const style = {
 	},
 	level: {
 		padding: "5px",
-		lineHeight: "20px"
+		lineHeight: "20px",
+		width: "24px",
+		height: "24px"
 	},
 	levelHack: {
 		margin: "3px",
