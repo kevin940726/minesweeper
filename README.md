@@ -88,6 +88,7 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 
 - [ ] Record high score.
 - [ ] Cleverly first click init.
+- [ ] Mobile friendly.
 - [ ] Game solver (_hard_, for non-guessing game).
 
 ### Contribute
