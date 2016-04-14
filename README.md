@@ -19,11 +19,42 @@ Simple minesweeper game built with React, Redux.
 ### How to Play
 Seriously !?
 
+### Build
+git clone this project, then.
+```bash
+cd minesweeper
+npm install
+npm start
+```
+Head to [localhost:8000](localhost:8000).
+
 ### API
 You can find the logic of the game in `./src/minesweeper.js`. If you don't like the UI or you want to make a enhancement, import it to your custom UI.
 
 ```js
 import Minesweeper, { Block, BlockRecord } from './src/minesweeper.js';
+```
+
+#### `Block`:
+An immutable Record store in each block. Check out [immutable.js](https://facebook.github.io/immutable-js/) for methods.
+
+```js
+const Block = Record({
+    type: 'normal',
+    mines: 0,
+    hidden: true,
+    flag: false
+});
+```
+
+#### `BlockRecord`:
+An immutable Record indicate the row and column of the block.
+
+```js
+const BlockRecord = Record({
+	row: 0,
+	col: 0
+});
 ```
 
 #### `Minesweepr()`:
@@ -49,34 +80,11 @@ Create the game board, load initial data. There are some game data you can get:
 const game = Minesweeper();
 ```
 
-#### `Minesweepr::init(rows, cols, mines, quickMode)`:
-Initialize and start the game. Turning `quickMode` on will make the first click a simple click, and after that will be setting flags.
+#### `Minesweepr::reset(rows, cols, mines, quickMode)`:
+Clear the game board and reset the config settings.
 
-```js
-game.init(9, 9, 10, false);
-```
-
-#### `Block`:
-An immutable Record store in each block. Check out [immutable.js](https://facebook.github.io/immutable-js/) for methods.
-
-```js
-const Block = Record({
-    type: 'normal',
-    mines: 0,
-    hidden: true,
-    flag: false
-});
-```
-
-#### `BlockRecord`:
-An immutable Record indicate the row and column of the block.
-
-```js
-const BlockRecord = Record({
-	row: 0,
-	col: 0
-});
-```
+#### `Minesweepr::init(rows, cols, mines, quickMode, exclude)`:
+Reset and start the game. The `exclude` take an array of `BlockRecord` to exclude from being mine.
 
 #### `Minesweeper::singleClick(BlockRecord)`:
 Perform a single click on a block. Set a flag if `mode` === `quick`, else reveal the block.
@@ -87,7 +95,7 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 ### TODO
 
 - [ ] Record high score.
-- [ ] Cleverly first click init.
+- [ x ] Cleverly first click init.
 - [ ] Mobile friendly.
 - [ ] Game solver (_hard_, for non-guessing game).
 

@@ -31,7 +31,7 @@ const reducers = handleActions({
 
 	RESTART_GAME: (state) => ({
 		...state,
-		mw: state.mw.init(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode)
+		mw: state.mw.reset(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode)
 	}),
 
 	UPDATE_TIME: (state, action) => ({

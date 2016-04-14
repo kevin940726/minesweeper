@@ -20,7 +20,7 @@ const config = {
 };
 
 const mw = Minesweeper();
-mw.init(config.rows, config.cols, config.mines, config.flagMode);
+mw.reset(config.rows, config.cols, config.mines, config.flagMode);
 
 const store = createStore(
     reducer, { mw, config },

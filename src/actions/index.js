@@ -3,11 +3,11 @@ import { BlockRecord } from '../minesweeper';
 import Cookie from 'cookies-js';
 
 export const handleClick = createAction('HANDLE_CLICK', (row, col) => (
-	new BlockRecord({ row, col })
+	{ row, col }
 ));
 
 export const handleFlag = createAction('HANDLE_FLAG', (row, col) => (
-	new BlockRecord({ row, col })
+	{ row, col }
 ));
 
 export const toggleMode = createAction('TOGGLE_MODE');

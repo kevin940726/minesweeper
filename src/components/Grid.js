@@ -10,7 +10,7 @@ const style = {
 		alignItems: "center",
 		justifyContent: "center",
 		fontSize: "20px",
-		margin: "4px",
+		margin: "3px",
 		boxSizing: "border-box",
 		lineHeight: "28px", // fuck you, waste 4 hours on this shit...
 		cursor: "default",
