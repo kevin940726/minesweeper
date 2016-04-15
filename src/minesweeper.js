@@ -1,4 +1,4 @@
-import Immutable, { Map, Record, OrderedMap } from 'immutable';
+import Immutable, { Map, Record, OrderedMap, List } from 'immutable';
 import { EventEmitter } from 'events';
 import rref from './rref';
 
@@ -186,6 +186,10 @@ const Minesweeper = () => ({
             const exclude = blockRecord.getSurrounding().concat([blockRecord]);
             this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
 
+            if (!this.solver(this.blocks.revealBlock(blockRecord))) {
+                return this.clickOn(blockRecord);
+            }
+
             this.status = "playing";
             this.mode = this.flagMode ? "quick" : "regular";
             this._eventEmitter.emit("statuschanged", this.status);
@@ -211,7 +215,7 @@ const Minesweeper = () => ({
 
                 let blocks = this.blocks;
 
-                this.keySeq()
+                blocks.keySeq()
                     .toArray()
                     .filter(key => blocks.get(key).type === "mine")
                     .forEach(mine => {
@@ -232,8 +236,6 @@ const Minesweeper = () => ({
             this.blocks = this.blocks.expandBlock(blockRecord);
         }
 
-        // for testing only
-        this.solver(this.blocks);
         return this;
     },
 
@@ -310,51 +312,80 @@ const Minesweeper = () => ({
                 r => blocks.get(r).hidden && !blocks.get(r).flag
             ));
     },
-    getEdgeHiddenBlock: function(edges, blocks) {
-        return edges.reduce( (edgeBlock, record) => {
-            record.getSurrounding()
-                .filter(r => blocks.get(r).hidden && !blocks.get(r).flag)
-                .forEach(r => {
-                    edgeBlock = edgeBlock.set(
-                        r,
-                        blocks.get(r)
-                    );
-                });
-            return edgeBlock;
-        }, OrderedMap());
+    solveByRref: function(blocks) {
+        /*
+         *  inspired by the great article by @ROBERT MASSAIOLI
+         *  https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/
+         */
+        let changed = false;
+
+        const edges = this.getEdgeBlockRecord(blocks);
+        const edgeBlocks = blocks.keySeq().toArray();
+
+        const matrix = edges.map(edge => {
+            const hiddenBlock = edge.getSurrounding()
+                .filter(record => blocks.get(record).hidden && !blocks.get(record).flag);
+            return edgeBlocks.map(unknown => (
+                hiddenBlock.find(h => Immutable.is(h, unknown)) ? 1 : 0
+            )).concat([
+                blocks.get(edge).mines - edge.getSurrounding().filter(record => blocks.get(record).hidden && blocks.get(record).flag).length
+            ]);
+        });
+
+        const remainBlocks = blocks.toKeyedSeq().filter( (block, record) => block.hidden && !block.flag );
+
+        const remainCondition = [
+            ...edgeBlocks.map(record =>
+                remainBlocks.find( (block, r) => Immutable.is(record, r) ) ? 1 : 0
+            ),
+            this.mines - blocks.filter(block => block.flag && block.hidden).size
+        ];
+
+        const rrefMatrix = rref(matrix.concat([remainCondition]));
+
+        const bounds = rrefMatrix.map(row =>
+            row.slice(0, row.size - 1)
+                .reduce( (bound, col) => (
+                    List([
+                        bound.get(0) + (col === 1 ? 1 : 0), // maximum bound
+                        bound.get(1) + (col === -1 ? -1 : 0) // minimum bound
+                    ])
+                ), List([0, 0]))
+                .push(row.last()) // concat with the augmented column
+        );
+
+        bounds.forEach( (bound, row) => {
+            if (bound.get(0) === bound.get(2) || bound.get(1) === bound.get(2)) {
+                const boundCondition = bound.get(0) === bound.get(2) ? 1 : -1;
+                rrefMatrix.get(row).slice(0, rrefMatrix.get(row).size - 1)
+                    .forEach( (col, i) => {
+                        if (col === boundCondition) {
+                            blocks = blocks.update(edgeBlocks[i], b => b.set("flag", true));
+                            changed = true;
+                        }
+                        else if (col === -boundCondition) {
+                            blocks = blocks.revealBlock(edgeBlocks[i]);
+                            changed = true;
+                        }
+                    });
+            }
+        });
+
+        if (!blocks.checkGame()) {
+            if (changed) {
+                return this.solveByRref(blocks);
+            }
+            else {
+                console.log('stop');
+                return false;
+            }
+        }
+        else {
+            console.log('done');
+            return true;
+        }
     },
-    getAllPossibility: function(edges, edgeBlocks, blocks) {
-        return edgeBlocks.keySeq()
-            .toArray()
-            .reduce( (possible, record) => {
-                return possible.reduce( (p, cur) => {
-                    return [
-                        ...p,
-                        cur.update(record, block => block.set("flag", true)),
-                        cur.update(record, block => block.set("flag", false))
-                    ];
-                }, []);
-            }, [blocks]);
-    },
-    getIsValid: function(edges, AllPossibility) {
-        return AllPossibility.filter(blocks => (
-            edges.every(record => (
-                record.getSurrounding().filter(r => blocks.get(r).flag).length === blocks.get(record).mines
-            ))
-        ));
-    },
-    getConfirmedRecord: function(edgeBlock, validPossibility) {
-        return edgeBlock.keySeq()
-            .toArray()
-            .filter(record => (
-                validPossibility.every(
-                    blocks => blocks.get(record).flag
-                ) ||
-                validPossibility.every(
-                    blocks => !blocks.get(record).flag
-                )
-            ));
-    },
+
 
     solver: function(blocks) {
         const beforeSolved = blocks.filter(block => !block.hidden || block.flag).size;
@@ -375,8 +406,6 @@ const Minesweeper = () => ({
             }
         });
 
-        this.blocks = blocks; // testing only
-
         // reveal those edge blocks being set flag.
         edges.forEach(record => {
             const block = blocks.get(record);
@@ -390,80 +419,18 @@ const Minesweeper = () => ({
             }
         });
 
-        this.blocks = blocks;
-
         const afterSolved = blocks.filter(block => !block.hidden || block.flag).size;
 
         if (afterSolved > beforeSolved) {
-            this.solver(blocks);
+            return this.solver(blocks);
         }
         else {
             if (!blocks.checkGame()) {
-                /*
-                 *  inspired by the great article by @ROBERT MASSAIOLI
-                 *  https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/
-                 */
-
-                let changed = false;
-                const edgeBlocks = this.getEdgeHiddenBlock(edges, blocks).keySeq().toArray();
-
-                console.log(edges);
-                console.log(edgeBlocks);
-
-                const matrix = edges.map(edge => {
-                    const hiddenBlock = edge.getSurrounding()
-                        .filter(record => blocks.get(record).hidden && !blocks.get(record).flag);
-                    return edgeBlocks.map(unknown => (
-                        hiddenBlock.find(h => Immutable.is(h, unknown)) ? 1 : 0
-                    )).concat([
-                        blocks.get(edge).mines - edge.getSurrounding().filter(record => blocks.get(record).hidden && blocks.get(record).flag).length
-                    ]);
-                });
-
-                console.log(matrix);
-
-                if (matrix.length) {
-                    const rrefMatrix = rref(matrix);
-
-                    const bounds = matrix.map(row =>
-                        row.slice(0, row.length - 1)
-                            .reduce( (bound, col) => (
-                                [
-                                    bound[0] + (col === 1 ? 1 : 0), // maximum bound
-                                    bound[1] + (col === -1 ? -1 : 0) // minimum bound
-                                ]
-                            ), [0, 0])
-                            .concat(row.slice(-1)) // concat with the augmented column
-                    );
-
-                    console.log(bounds);
-
-                    bounds.forEach( (bound, row) => {
-                        if (bound[0] === bound[2] || bound[1] === bound[2]) {
-                            const boundCondition = bound[0] === bound[2] ? 1 : -1;
-                            matrix[row].slice(0, matrix[row].length - 1)
-                                .forEach( (col, i) => {
-                                    if (col === boundCondition) {
-                                        console.log("flag", edgeBlocks[i]);
-                                        blocks = blocks.update(edgeBlocks[i], b => b.set("flag", true));
-                                        changed = true;
-                                    }
-                                    else if (col === -boundCondition) {
-                                        console.log("reveal", edgeBlocks[i]);
-                                        blocks = blocks.revealBlock(edgeBlocks[i]);
-                                        changed = true;
-                                    }
-                                });
-                        }
-                    });
-
-                    this.blocks = blocks;
-
-                    if (changed) {
-                        this.solver(blocks);
-                    }
-                }
-
+                return this.solveByRref(blocks);
+            }
+            else {
+                console.log('done');
+                return true;
             }
         }
 

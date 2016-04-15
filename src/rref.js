@@ -1,73 +1,51 @@
-import { fromJS, List, Range, Seq, Map, Record } from 'immutable';
-
-const BlockRecord = Record({ row: 0, col: 0 });
-const Block = Record({
-	type: 'normal',
-	mines: 0,
-	hidden: true,
-	flag: false
-});
-
-let edges = Map();
-edges = edges.set(
-	new BlockRecord({ row: 0, col: 1 }),
-	new Block({ mines: 1, hidden: false })
-);
-edges = edges.set(
-	new BlockRecord({ row: 1, col: 1 }),
-	new Block({ mines: 2, hidden: false })
-);
-edges = edges.set(
-	new BlockRecord({ row: 2, col: 1 }),
-	new Block({ mines: 1, hidden: false })
-);
-edges = edges.set(
-	new BlockRecord({ row: 3, col: 1 }),
-	new Block({ mines: 1, hidden: false })
-);
-
-let edgeBlocks = Map();
-edgeBlocks = edgeBlocks.set(
-	new BlockRecord({ row: 0, col: 0 }),
-	new Block({ type: 'mine' })
-);
-edgeBlocks = edgeBlocks.set(
-	new BlockRecord({ row: 1, col: 0 }),
-	new Block({ mines: 2 })
-);
-edgeBlocks = edgeBlocks.set(
-	new BlockRecord({ row: 2, col: 0 }),
-	new Block({ type: 'mine' })
-);
-edgeBlocks = edgeBlocks.set(
-	new BlockRecord({ row: 3, col: 0 }),
-	new Block({ mines: 1 })
-);
+import { fromJS, List, Range, is } from 'immutable';
 
 const rref = (matrix) => {
 	const m = List.isList(matrix) ? matrix : fromJS(matrix);
 
-	let M = m.sort( (prev, next) => (
-		prev.findIndex(col => col !== 0) < next.findIndex(col => col !== 0) ? -1 : 1
-	));
+	let A = m;
+	const rows = A.size;
+	const columns = A.get(0).size;
 
-	Range(0, m.get(0).size - 1)
-		.forEach(col => {
-			const reduced = M.toKeyedSeq().filter(row => row.get(col) !== 0);
-			reduced.butLast().forEach( (seq, i) => {
-				const reducer = seq.get(reduced.last().findIndex(c => c === 1));
-				M = M.update(i, row => row.map( (c, j) => c - reduced.last().get(j) * reducer ));
-			});
-		});
+	let lead = 0;
+	for (let k = 0; k < rows; k++) {
+		if (columns <= lead) {
+			return A;
+		}
 
-	return M;
+		let i = k;
+		while (A.get(i).get(lead) === 0) {
+			i++;
+			if (rows === i) {
+				i = k;
+				lead++;
+				if (columns === lead) {
+					return A;
+				}
+			}
+		}
+
+		const irow = A.get(i);
+		const krow = A.get(k);
+		A = A.update(i, r => krow);
+		A = A.update(k, r => irow);
+
+		let val = A.get(k).get(lead);
+		for (let j = 0; j < columns; j++) {
+			A = A.update(k, r => r.update(j, c => c / val));
+		}
+
+		for (let i = 0; i < rows; i++) {
+			if (i === k) continue;
+			val = A.get(i).get(lead);
+			for (let j = 0; j < columns; j++) {
+				A = A.update(i, r => r.update(j, c => c - val * A.get(k).get(j)));
+			}
+		}
+		lead++;
+	}
+
+	return A;
 };
 
-const matrix = [
-	[1, 1, 0, 0, 1],
-	[1, 1, 1, 0, 1],
-	[0, 1, 1, 1, 2],
-	[0, 0, 1, 1, 1]
-];
-
-console.log(rref(matrix));
+export default rref;
