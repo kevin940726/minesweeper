@@ -104,6 +104,7 @@ const Minesweeper = () => ({
     timePass: 0,
     mode: "regular",
     flagMode: false,
+    checkIsSolvable: false,
 
     _timer: null,
     _eventEmitter: new EventEmitter(),
@@ -112,7 +113,7 @@ const Minesweeper = () => ({
     },
 
 
-    reset: function(rows, cols, mines, flagMode) {
+    reset: function(rows, cols, mines, flagMode, checkIsSolvable) {
         // reset variables
         this.rows = rows || this.rows;
         this.cols = cols || this.cols;
@@ -123,6 +124,7 @@ const Minesweeper = () => ({
         this.timePass = 0;
         this.mode = "regular";
         this.flagMode = flagMode || this.flagMode;
+        this.checkIsSolvable = checkIsSolvable || this.checkIsSolvable;
         clearInterval(this._timer);
         this._eventEmitter.emit("statuschanged", this.status);
 
@@ -186,7 +188,7 @@ const Minesweeper = () => ({
             const exclude = blockRecord.getSurrounding().concat([blockRecord]);
             this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
 
-            if (!this.solver(this.blocks.revealBlock(blockRecord))) {
+            if (this.checkIsSolvable && !this.solver(this.blocks.revealBlock(blockRecord))) {
                 return this.clickOn(blockRecord);
             }
 
@@ -320,7 +322,7 @@ const Minesweeper = () => ({
         let changed = false;
 
         const edges = this.getEdgeBlockRecord(blocks);
-        const edgeBlocks = blocks.keySeq().toArray();
+        const edgeBlocks = blocks.keySeq().filter(record => blocks.get(record).hidden).toArray();
 
         const matrix = edges.map(edge => {
             const hiddenBlock = edge.getSurrounding()

@@ -65,6 +65,17 @@ const reducers = handleActions({
 				flagMode: state.mw.flagMode
 			}
 		};
+	},
+	TOGGLE_CHECK_IS_SOLVABLE: (state) => {
+		state.mw.checkIsSolvable = !state.mw.checkIsSolvable;
+		return {
+			...state,
+			mw: state.mw,
+			config: {
+				...state.config,
+				checkIsSolvable: state.mw.checkIsSolvable
+			}
+		};
 	}
 });
 

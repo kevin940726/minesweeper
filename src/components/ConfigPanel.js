@@ -100,12 +100,16 @@ const style = {
 	}
 };
 
-const ConfigPanel = ({ show, rows, cols, mines, flagMode, saveConfig, saveAllConfig, togglePanel, toggleFlagMode }) => (
+const ConfigPanel = ({ show, rows, cols, mines, flagMode, checkIsSolvable, saveConfig, saveAllConfig, togglePanel, toggleFlagMode, toggleCheckIsSolvable }) => (
 	<form style={[ style.base, show && style.show ]} onSubmit={togglePanel}>
 		<div style={style.upperGroup}>
 			<label key="flagModeLabel" style={[ style.label, style.checkbox ]}>
 				{flagMode ? (<span className={hasFont() || "emoji s_zap"}>⚡</span>) : <span className={hasFont() || "emoji s_snail"}>🐌</span>}
 				<input key="flagMode" type="checkbox" onChange={e => toggleFlagMode()} style={{display: 'none'}} checked={flagMode}></input>
+			</label>
+			<label key="checkIsSolvableLabel" style={[ style.label, style.checkbox ]}>
+				{checkIsSolvable ? (<span className={hasFont() || "emoji s_robot"}>🤖</span>) : <span className={hasFont() || "emoji s_hand"}>✋</span>}
+				<input key="checkIsSolvable" type="checkbox" onChange={e => toggleCheckIsSolvable()} style={{display: 'none'}} checked={checkIsSolvable}></input>
 			</label>
 			<div style={style.line}></div>
 			<a className={hasFont() || "emoji s_seedling"} key="beginner" style={[ style.checkbox, style.level, hasFont() || style.levelHack ]} onClick={e => saveAllConfig(9, 9, 10)}>🌱</a>

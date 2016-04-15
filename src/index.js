@@ -14,6 +14,7 @@ const config = {
     show: false,
     mode: false,
     flagMode: Cookie.get("flagMode") === "true" || false,
+    checkIsSolvable: Cookie.get("checkIsSolvable") === "true" || false,
     rows: parseInt(Cookie.get("rows")) || 9,
     cols: parseInt(Cookie.get("cols")) || 9,
     mines: parseInt(Cookie.get("mines")) || 10

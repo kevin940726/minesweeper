@@ -26,3 +26,7 @@ export const togglePanel = createAction('TOGGLE_PANEL');
 export const toggleFlagMode = createAction('TOGGLE_FLAG_MODE', () => {
 	Cookie.set("flagMode", Cookie.get("flagMode") === "true" ? "false" : "true");
 });
+
+export const toggleCheckIsSolvable = createAction('TOGGLE_CHECK_IS_SOLVABLE', () => {
+	Cookie.set("checkIsSolvable", Cookie.get("checkIsSolvable") === "true" ? "false" : "true");
+});

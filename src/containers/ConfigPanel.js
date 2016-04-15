@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
 import configPanel from '../components/ConfigPanel';
-import { saveConfig, togglePanel, toggleFlagMode } from '../actions';
+import { saveConfig, togglePanel, toggleFlagMode, toggleCheckIsSolvable } from '../actions';
 
 const mapStateToProps = (state) => ({
 	rows: state.config.rows,
 	cols: state.config.cols,
 	mines: state.config.mines,
 	show: state.config.show,
-	flagMode: state.config.flagMode
+	flagMode: state.config.flagMode,
+	checkIsSolvable: state.config.checkIsSolvable
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -22,6 +23,9 @@ const mapDispatchToProps = (dispatch) => ({
 
 	toggleFlagMode: () => {
 		dispatch(toggleFlagMode());
+	},
+	toggleCheckIsSolvable: () => {
+		dispatch(toggleCheckIsSolvable());
 	},
 
 	saveAllConfig: (rows, cols, mines) => {
