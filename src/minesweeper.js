@@ -21,25 +21,30 @@ Map.prototype.initSurrounding = function(record) {
     );
 };
 
-Map.prototype.revealBlock = function(blockRecord) {
+Map.prototype.revealBlock = function(blockRecord, revealMineCallback) {
     // click on normal hidden block
-    let blocks = this.update(
-        blockRecord,
-        b => b.set("hidden", false)
-    );
-
-    if (!this.get(blockRecord).mines) {
-        blockRecord.getSurrounding()
-            .filter(record => this.get(record).hidden)
-            .forEach(record => {
-                blocks = blocks.revealBlock(record);
-            });
+    if (this.get(blockRecord).type === 'mine') {
+        return revealMineCallback();
     }
+    else {
+        let blocks = this.update(
+            blockRecord,
+            b => b.set("hidden", false)
+        );
 
-    return blocks;
+        if (!this.get(blockRecord).mines) {
+            blockRecord.getSurrounding()
+                .filter(record => this.get(record).hidden)
+                .forEach(record => {
+                    blocks = blocks.revealBlock(record, revealMineCallback);
+                });
+        }
+
+        return blocks;
+    }
 };
 
-Map.prototype.expandBlock = function(blockRecord) {
+Map.prototype.expandBlock = function(blockRecord, revealMineCallback) {
     const block = this.get(blockRecord);
     let blocks = this;
 
@@ -47,7 +52,7 @@ Map.prototype.expandBlock = function(blockRecord) {
         blockRecord.getSurrounding()
             .filter(record => this.get(record).hidden && !this.get(record).flag)
             .forEach(record => {
-                blocks = blocks.revealBlock(record);
+                blocks = blocks.revealBlock(record, revealMineCallback);
             });
     }
 
@@ -180,6 +185,26 @@ const Minesweeper = () => ({
         return this;
     },
 
+    revealMine: function() {
+        this.status = "lose";
+        this._eventEmitter.emit("statuschanged", this.status);
+
+        clearInterval(this._timer);
+
+        let blocks = this.blocks;
+
+        blocks.keySeq()
+            .toArray()
+            .filter(key => blocks.get(key).type === "mine")
+            .forEach(mine => {
+                blocks = blocks.update(
+                    mine,
+                    b => b.set("hidden", false)
+                );
+            });
+
+        return blocks;
+    },
     clickOn: function(blockRecord) {
         const block = this.blocks.get(blockRecord);
 
@@ -210,32 +235,15 @@ const Minesweeper = () => ({
         // click on hidden block
         else if (block.hidden) {
             if (block.type === 'mine') {
-                this.status = "lose";
-                this._eventEmitter.emit("statuschanged", this.status);
-
-                clearInterval(this._timer);
-
-                let blocks = this.blocks;
-
-                blocks.keySeq()
-                    .toArray()
-                    .filter(key => blocks.get(key).type === "mine")
-                    .forEach(mine => {
-                        blocks = blocks.update(
-                            mine,
-                            b => b.set("hidden", false)
-                        );
-                    });
-
-                this.blocks = blocks;
+                this.blocks = this.revealMine();
             }
             else {
-                this.blocks = this.blocks.revealBlock(blockRecord);
+                this.blocks = this.blocks.revealBlock(blockRecord, () => this.revealMine());
             }
         }
         // click on number, expand surrounding block
         else if (!block.hidden) {
-            this.blocks = this.blocks.expandBlock(blockRecord);
+            this.blocks = this.blocks.expandBlock(blockRecord, () => this.revealMine());
         }
 
         return this;
@@ -250,7 +258,7 @@ const Minesweeper = () => ({
             this.minesRemaining += this.blocks.get(blockRecord).flag ? (this.minesRemaining <= 0 ? 0 : -1) : 1;
         }
         else {
-            this.blocks = this.blocks.expandBlock(blockRecord);
+            this.blocks = this.blocks.expandBlock(blockRecord, () => this.revealMine());
         }
 
         return this;
