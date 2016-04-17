@@ -9,6 +9,8 @@ Simple minesweeper game built with React, Redux.
 
 ### Features
 
+** Working Progress... **
+
 - [x] Custom game board and three different major difficulty.
 - [x] Counting Time.
 - [x] Mines left.

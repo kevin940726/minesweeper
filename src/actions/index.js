@@ -2,13 +2,27 @@ import { createAction } from 'redux-actions';
 import { BlockRecord } from '../minesweeper';
 import Cookie from 'cookies-js';
 
-export const handleClick = createAction('HANDLE_CLICK', (row, col) => (
-	{ row, col }
-));
+export const setGame = createAction('SET_GAME');
 
-export const handleFlag = createAction('HANDLE_FLAG', (row, col) => (
-	{ row, col }
-));
+export const toggleLoading = createAction('TOGGLE_LOADING');
+
+export const handleClick = (row, col) => (
+	(dispatch, getState) => {
+		// dispatch(toggleLoading());
+		getState().mw.singleClick({ row, col }).then(mw => {
+			// dispatch(toggleLoading());
+			return dispatch(setGame(mw));
+		});
+	}
+);
+
+// export const handleClick = createAction('HANDLE_CLICK', (row, col) => (
+// 	mw.singleClick({ row, col })
+// ));
+
+export const handleFlag = (row, col) => (
+	(dispatch, getState) => getState().mw.rightClick({ row, col }).then(mw => dispatch(setGame(mw)))
+);
 
 export const toggleMode = createAction('TOGGLE_MODE');
 

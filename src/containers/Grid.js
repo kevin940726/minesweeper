@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import grid from '../components/Grid';
 import { BlockRecord } from '../minesweeper';
-import { handleClick, handleFlag } from '../actions';
+import { handleClick, handleFlag, setGame } from '../actions';
 import { createSelector } from 'reselect';
 
 const blockSelector = createSelector(
@@ -17,7 +17,7 @@ const mapStateToProps = (state, ownProps) => ({
 	block: blockSelector(state, ownProps)
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch, ownProps) => ({
 	handleClick: (row, col) => {
 		dispatch(handleClick(row, col));
 	},

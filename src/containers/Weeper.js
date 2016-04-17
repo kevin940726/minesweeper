@@ -4,7 +4,8 @@ import { handleClick, handleFlag } from '../actions';
 
 const mapStateToProps = (state) => ({
 	rows: state.mw.rows,
-	cols: state.mw.cols
+	cols: state.mw.cols,
+	isLoading: state.config.isLoading
 });
 
 const Weeper = connect(mapStateToProps)(weeper);

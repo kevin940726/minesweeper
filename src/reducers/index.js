@@ -2,23 +2,37 @@ import { handleActions } from 'redux-actions';
 import { BlockRecord, Block } from '../minesweeper';
 
 const reducers = handleActions({
-	HANDLE_CLICK: (state, action) => {
-		state.mw.singleClick(action.payload);
+	SET_GAME: (state, action) => ({
+		...state,
+		mw: action.payload
+	}),
 
-		return {
-			...state,
-			mw: state.mw
-		};
-	},
+	TOGGLE_LOADING: (state) => ({
+		...state,
+		config: {
+			...state.config,
+			isLoading: !state.config.isLoading
+		}
+	}),
 
-	HANDLE_FLAG: (state, action) => {
-		state.mw.rightClick(action.payload);
-
-		return {
-			...state,
-			mw: state.mw
-		};
-	},
+	// HANDLE_CLICK: (state, action) => {
+	// 	state.mw.singleClick(action.payload);
+	//
+	// 	return {
+	// 		...state,
+	// 		mw: state.mw,
+	// 		pending: state.mw.singleClick(action.payload)
+	// 	};
+	// },
+	//
+	// HANDLE_FLAG: (state, action) => {
+	// 	state.mw.rightClick(action.payload);
+	//
+	// 	return {
+	// 		...state,
+	// 		mw: state.mw
+	// 	};
+	// },
 
 	TOGGLE_MODE: (state, action) => {
 		state.mw.mode = state.mw.mode === "regular" ? "quick" : "regular";
@@ -31,7 +45,10 @@ const reducers = handleActions({
 
 	RESTART_GAME: (state) => ({
 		...state,
-		mw: state.mw.reset(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode)
+		mw: {
+			...state.mw,
+			blocks: state.mw.reset(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode, state.config.checkIsSolvable)
+		}
 	}),
 
 	UPDATE_TIME: (state, action) => ({

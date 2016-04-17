@@ -23,6 +23,9 @@ const style = {
 		alignItems: "center",
 		flexDirection: "row",
 		backgroundColor: "#FFF"
+	},
+	isLoading: {
+		// backgroundColor: "rgba(0, 0, 0, 0.5)"
 	}
 };
 
@@ -41,8 +44,8 @@ let Row = ({ cols, row }) => (
 );
 Row = Radium(Row);
 
-const Weeper = ({ rows, cols }) => (
-	<div style={style.base}>
+const Weeper = ({ rows, cols, isLoading }) => (
+	<div style={[ style.base, isLoading && style.isLoading ]}>
 		<ControlBar />
 		{new Array(rows).fill(0).map((cur, row) => (
 			<Row key={"row" + row} cols={cols} row={row} />

@@ -1,7 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import thunk from 'redux-thunk';
+import { createStore, applyMiddleware, compose } from 'redux';
 import reducer from './reducers';
 import App from './components/App';
 import { changeMode } from './actions';
@@ -11,6 +12,7 @@ import Cookie from 'cookies-js';
 import Minesweeper from './minesweeper';
 
 const config = {
+    isLoading: false,
     show: false,
     mode: false,
     flagMode: Cookie.get("flagMode") === "true" || false,
@@ -21,11 +23,14 @@ const config = {
 };
 
 const mw = Minesweeper();
-mw.reset(config.rows, config.cols, config.mines, config.flagMode);
+mw.blocks = mw.reset(config.rows, config.cols, config.mines, config.flagMode, config.checkIsSolvable);
 
 const store = createStore(
-    reducer, { mw, config },
-    window.devToolsExtension ? window.devToolsExtension() : f => f
+    reducer, { mw, config, blocks: mw.blocks },
+    compose(
+        applyMiddleware(thunk),
+        window.devToolsExtension ? window.devToolsExtension() : f => f
+    )
 );
 
 render(

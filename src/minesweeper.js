@@ -1,4 +1,4 @@
-import Immutable, { Map, Record, OrderedMap, List } from 'immutable';
+import Immutable, { Map, Record, OrderedMap, List, Range } from 'immutable';
 import { EventEmitter } from 'events';
 import rref from './rref';
 
@@ -12,12 +12,9 @@ export const Block = Record({
 
 Map.prototype.initSurrounding = function(record) {
     const block = this.get(record);
-    return this.set(
+    return this.update(
         record,
-        new Block({
-            type: block ? block.type : 'normal',
-            mines: block ? block.mines + 1 : 1
-        })
+        b => b.set("mines", block.mines + 1)
     );
 };
 
@@ -133,6 +130,7 @@ const Minesweeper = () => ({
         clearInterval(this._timer);
         this._eventEmitter.emit("statuschanged", this.status);
 
+        let blocks = this.blocks;
         // inject this game's rows and cols.
         BlockRecord.prototype.getSurrounding = function() {
             return [].concat(...[-1, 0, 1].map(i => (
@@ -148,18 +146,18 @@ const Minesweeper = () => ({
         // reset blocks
         new Array(this.rows).fill(0).map((cur, row) => (
             new Array(this.cols).fill(0).map((cur, col) => {
-                this.blocks = this.blocks.set(
+                blocks = blocks.set(
                     new BlockRecord({ row, col }),
                     new Block()
                 );
             })
         ));
 
-        return this;
+        return blocks;
     },
 
     init: function(rows, cols, mines, flagMode, exclude = []) {
-        this.reset(rows, cols, mines, flagMode);
+        let blocks = this.reset(rows, cols, mines, flagMode);
 
         exclude = exclude.map(record => record.row * this.cols + record.col);
 
@@ -171,18 +169,16 @@ const Minesweeper = () => ({
                     col: index % this.cols
                 });
 
-                this.blocks = this.blocks.set(blockRecord, new Block({
-                    type: 'mine'
-                }));
+                blocks = blocks.update(blockRecord, b => b.set("type", 'mine'));
 
                 // initialize numbers of surronding mines.
                 blockRecord.getSurrounding()
                     .forEach(record => {
-                        this.blocks = this.blocks.initSurrounding(record);
+                        blocks = blocks.initSurrounding(record);
                     });
             });
 
-        return this;
+        return blocks;
     },
 
     revealMine: function() {
@@ -206,15 +202,15 @@ const Minesweeper = () => ({
         return blocks;
     },
     clickOn: function(blockRecord) {
-        const block = this.blocks.get(blockRecord);
+        let blocks = this.blocks;
 
         // first click, ensure no mines put in the surrounding of the clicked position.
         if (this.status === "ready") {
             const exclude = blockRecord.getSurrounding().concat([blockRecord]);
-            this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
 
-            if (this.checkIsSolvable && !this.solver(this.blocks.revealBlock(blockRecord))) {
-                return this.clickOn(blockRecord);
+            blocks = this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
+            while (this.checkIsSolvable && !this.solveByRref(blocks.revealBlock(blockRecord))) {
+                blocks = this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
             }
 
             this.status = "playing";
@@ -228,6 +224,7 @@ const Minesweeper = () => ({
             }, 1000);
         }
 
+        const block = blocks.get(blockRecord);
         // click on flag
         if (block.flag) {
             // do nothing
@@ -235,60 +232,79 @@ const Minesweeper = () => ({
         // click on hidden block
         else if (block.hidden) {
             if (block.type === 'mine') {
-                this.blocks = this.revealMine();
+                blocks = this.revealMine();
             }
             else {
-                this.blocks = this.blocks.revealBlock(blockRecord, () => this.revealMine());
+                blocks = blocks.revealBlock(blockRecord, () => this.revealMine());
             }
         }
         // click on number, expand surrounding block
         else if (!block.hidden) {
-            this.blocks = this.blocks.expandBlock(blockRecord, () => this.revealMine());
+            blocks = blocks.expandBlock(blockRecord, () => this.revealMine());
         }
 
-        return this;
+        return blocks;
     },
 
     rightClickOn: function(blockRecord) {
-        const block = this.blocks.get(blockRecord);
+        let blocks = this.blocks;
+        const block = blocks.get(blockRecord);
 
         if (block.hidden) {
-            this.blocks = this.blocks.setFlag(blockRecord);
+            blocks = blocks.setFlag(blockRecord);
 
-            this.minesRemaining += this.blocks.get(blockRecord).flag ? (this.minesRemaining <= 0 ? 0 : -1) : 1;
+            this.minesRemaining += blocks.get(blockRecord).flag ? (this.minesRemaining <= 0 ? 0 : -1) : 1;
         }
         else {
-            this.blocks = this.blocks.expandBlock(blockRecord, () => this.revealMine());
+            blocks = blocks.expandBlock(blockRecord, () => this.revealMine());
         }
 
-        return this;
+        return blocks;
     },
 
     singleClick: function(blockRecord) {
-        if (this.status !== "win" && this.status !== "lose") {
-            if (this.mode === "regular") {
-                this.clickOn(new BlockRecord(blockRecord));
-            }
-            else if (this.mode === "quick") {
-                this.rightClickOn(new BlockRecord(blockRecord));
-            }
+        return new Promise(
+            (resolve, reject) => {
+                setTimeout(() => {
+                    if (this.status !== "win" && this.status !== "lose") {
+                        if (this.mode === "regular") {
+                            this.blocks = this.clickOn(new BlockRecord(blockRecord));
+                            // console.log('resolve');
+                            resolve(this);
+                        }
+                        else if (this.mode === "quick") {
+                            this.blocks = this.rightClickOn(new BlockRecord(blockRecord));
+                            // console.log('resolve');
+                            resolve(this);
+                        }
 
-            this.checkGame();
-        }
-        return this;
+                        this.checkGame();
+                    }
+                }, 0);
+            }
+        );
     },
     rightClick: function(blockRecord) {
-        if (this.status !== "win" && this.status !== "lose") {
-            if (this.mode === "regular") {
-                this.rightClickOn(new BlockRecord(blockRecord));
-            }
-            else if (this.mode === "quick") {
-                this.clickOn(new BlockRecord(blockRecord));
-            }
+        return new Promise(
+            (resolve, reject) => {
+                setTimeout(() => {
+                    if (this.status !== "win" && this.status !== "lose") {
+                        if (this.mode === "regular") {
+                            this.blocks = this.rightClickOn(new BlockRecord(blockRecord));
+                            console.log('resolve');
+                            resolve(this);
+                        }
+                        else if (this.mode === "quick") {
+                            this.blocks = this.clickOn(new BlockRecord(blockRecord));
+                            console.log('resolve');
+                            resolve(this);
+                        }
 
-            this.checkGame();
-        }
-        return this;
+                        this.checkGame();
+                    }
+                }, 0);
+            }
+        );
     },
 
     checkGame: function() {
@@ -370,10 +386,12 @@ const Minesweeper = () => ({
                 rrefMatrix.get(row).slice(0, rrefMatrix.get(row).size - 1)
                     .forEach( (col, i) => {
                         if (col === boundCondition) {
+                            // console.log('flag', edgeBlocks[i]);
                             blocks = blocks.update(edgeBlocks[i], b => b.set("flag", true));
                             changed = true;
                         }
                         else if (col === -boundCondition) {
+                            // console.log('reveal', edgeBlocks[i]);
                             blocks = blocks.revealBlock(edgeBlocks[i]);
                             changed = true;
                         }
@@ -383,23 +401,23 @@ const Minesweeper = () => ({
 
         if (!blocks.checkGame()) {
             if (changed) {
-                return this.solveByRref(blocks);
+                return this.solver(blocks);
             }
             else {
-                console.log('stop');
+                // console.log('stop');
                 return false;
             }
         }
         else {
-            console.log('done');
+            // console.log('done');
             return true;
         }
     },
 
 
     solver: function(blocks) {
-        const beforeSolved = blocks.filter(block => !block.hidden || block.flag).size;
         const edges = this.getEdgeBlockRecord(blocks);
+        let changed = false;
 
         // set flag to those satisfy the mines number
         edges.forEach(record => {
@@ -413,25 +431,24 @@ const Minesweeper = () => ({
                         b => b.set("flag", true)
                     );
                 });
+                changed = true;
             }
         });
 
         // reveal those edge blocks being set flag.
         edges.forEach(record => {
-            const block = blocks.get(record);
+            const surrounding = record.getSurrounding();
 
-            if (record.getSurrounding().filter(r => blocks.get(r).flag).length === block.mines) {
-                record.getSurrounding()
-                    .filter(r => blocks.get(r).hidden && !blocks.get(r).flag)
+            if (surrounding.filter(r => blocks.get(r).hidden && blocks.get(r).flag).length === blocks.get(record).mines) {
+                surrounding.filter(r => blocks.get(r).hidden && !blocks.get(r).flag)
                     .forEach(r => {
                         blocks = blocks.revealBlock(r);
                     });
+                changed = true;
             }
         });
 
-        const afterSolved = blocks.filter(block => !block.hidden || block.flag).size;
-
-        if (afterSolved > beforeSolved) {
+        if (changed) {
             return this.solver(blocks);
         }
         else {
@@ -439,7 +456,7 @@ const Minesweeper = () => ({
                 return this.solveByRref(blocks);
             }
             else {
-                console.log('done');
+                // console.log('done');
                 return true;
             }
         }
