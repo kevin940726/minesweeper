@@ -97,7 +97,7 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 ### TODO
 
 - [ ] Record high score.
-- [ x ] Cleverly first click init.
+- [x] Cleverly first click init.
 - [ ] Mobile friendly.
 - [ ] Game solver (_hard_, for non-guessing game).
 
