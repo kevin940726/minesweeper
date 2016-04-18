@@ -76,8 +76,8 @@ const style = {
 
 const TimePass = Radium(React.createClass({
 	componentDidMount() {
-		this.props.mw.on("timeupdated", () => {
-			this.props.updateTime();
+		this.props.mw.on("timeupdated", timePass => {
+			this.props.updateTime(timePass);
 		});
 	},
 

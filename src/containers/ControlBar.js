@@ -16,7 +16,7 @@ const minesRemainingSelector = createSelector(
 );
 
 const timePassSelector = createSelector(
-	state => state.mw.timePass,
+	state => state.timePass,
 	timePass => "000".substring(0, 3 - timePass.toString().length) + timePass.toString()
 );
 
@@ -33,8 +33,8 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(restartGame());
 	},
 
-	updateTime: () => {
-		dispatch(updateTime());
+	updateTime: timePass => {
+		dispatch(updateTime(timePass));
 	}
 });
 

@@ -4,7 +4,10 @@ import { BlockRecord, Block } from '../minesweeper';
 const reducers = handleActions({
 	SET_GAME: (state, action) => ({
 		...state,
-		mw: action.payload
+		mw: {
+			...state.mw,
+			blocks: action.payload
+		}
 	}),
 
 	TOGGLE_LOADING: (state) => ({
@@ -48,12 +51,13 @@ const reducers = handleActions({
 		mw: {
 			...state.mw,
 			blocks: state.mw.reset(state.config.rows, state.config.cols, state.config.mines, state.config.flagMode, state.config.checkIsSolvable)
-		}
+		},
+		timePass: 0
 	}),
 
 	UPDATE_TIME: (state, action) => ({
 		...state,
-		timePass: state.mw.timePass
+		timePass: action.payload
 	}),
 
 	SAVE_CONFIG: (state, action) => ({

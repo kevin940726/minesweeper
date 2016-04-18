@@ -16,10 +16,6 @@ export const handleClick = (row, col) => (
 	}
 );
 
-// export const handleClick = createAction('HANDLE_CLICK', (row, col) => (
-// 	mw.singleClick({ row, col })
-// ));
-
 export const handleFlag = (row, col) => (
 	(dispatch, getState) => getState().mw.rightClick({ row, col }).then(mw => dispatch(setGame(mw)))
 );

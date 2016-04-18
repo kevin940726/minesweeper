@@ -26,7 +26,7 @@ const mw = Minesweeper();
 mw.blocks = mw.reset(config.rows, config.cols, config.mines, config.flagMode, config.checkIsSolvable);
 
 const store = createStore(
-    reducer, { mw, config, blocks: mw.blocks },
+    reducer, { mw, config, timePass: 0 },
     compose(
         applyMiddleware(thunk),
         window.devToolsExtension ? window.devToolsExtension() : f => f
