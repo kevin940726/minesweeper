@@ -18,25 +18,6 @@ const reducers = handleActions({
 		}
 	}),
 
-	// HANDLE_CLICK: (state, action) => {
-	// 	state.mw.singleClick(action.payload);
-	//
-	// 	return {
-	// 		...state,
-	// 		mw: state.mw,
-	// 		pending: state.mw.singleClick(action.payload)
-	// 	};
-	// },
-	//
-	// HANDLE_FLAG: (state, action) => {
-	// 	state.mw.rightClick(action.payload);
-	//
-	// 	return {
-	// 		...state,
-	// 		mw: state.mw
-	// 	};
-	// },
-
 	TOGGLE_MODE: (state, action) => {
 		state.mw.mode = state.mw.mode === "regular" ? "quick" : "regular";
 
