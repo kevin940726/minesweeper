@@ -6,15 +6,14 @@ const style = {
 	base: {
 		display: "flex",
 		position: "relative",
-		height: "30px",
+		height: "28px",
 		width: "30px",
 		alignItems: "center",
 		justifyContent: "center",
 		fontSize: "20px",
-		padding: "3px",
+		padding: "3px 3px 5px 3px",
 		lineHeight: "28px", // fuck you, waste 4 hours on this shit...
 		cursor: "default",
-		// paddingBottom: "2px",
 		transition: "background-color 0.1s ease-out",
 		backgroundColor: "#FFF",
 		backgroundClip: "content-box",
@@ -35,6 +34,8 @@ const style = {
 
 	hidden: {
 		backgroundColor: "#EEE",
+		padding: "3px",
+		height: "30px",
 		":hover": {
 			backgroundColor: "#F5F5F5"
 		}
