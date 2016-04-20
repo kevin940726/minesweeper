@@ -17,8 +17,6 @@ const style = {
 		transition: "background-color 0.1s ease-out",
 		backgroundColor: "#FFF",
 		backgroundClip: "content-box",
-		// border: "1px solid #EEE",
-		// boxShadow: "inset 0 0 0 3px #FFF, inset 0 0 0 4px #EEE",
 		userSelect: "none"
 	},
 	after: {

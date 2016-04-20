@@ -8,16 +8,25 @@ export const toggleLoading = createAction('TOGGLE_LOADING');
 
 export const handleClick = (row, col) => (
 	(dispatch, getState) => {
-		// dispatch(toggleLoading());
-		getState().mw.singleClick({ row, col }).then(mw => {
-			// dispatch(toggleLoading());
-			return dispatch(setGame(mw));
-		});
+		if (getState().mw.status === 'ready' && getState().mw.checkIsSolvable) {
+			Promise.resolve(dispatch(toggleLoading()))
+				.then(() => getState().mw.singleClick({ row, col }))
+				.then(mw => dispatch(setGame(mw)))
+				.then(() => dispatch(toggleLoading()));
+		}
+		else {
+			getState().mw.singleClick({ row, col })
+				.then(mw => dispatch(setGame(mw)));
+		}
 	}
 );
 
 export const handleFlag = (row, col) => (
-	(dispatch, getState) => getState().mw.rightClick({ row, col }).then(mw => dispatch(setGame(mw)))
+	(dispatch, getState) => {
+		getState().mw.rightClick({ row, col }).then(mw => {
+			dispatch(setGame(mw));
+		});
+	}
 );
 
 export const toggleMode = createAction('TOGGLE_MODE');
