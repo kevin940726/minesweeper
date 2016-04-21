@@ -1,5 +1,5 @@
 # minesweeper
-Simple minesweeper game built with React, Redux.
+The most complete minesweeper game built with React, Redux and Immutable.js.
 
 [Play Now!](https://kevin940726.github.io/minesweeper)
 
@@ -17,6 +17,7 @@ Simple minesweeper game built with React, Redux.
 - [x] Set flags.
 - [x] Quick mode and mode switch.
 - [x] Settings save in cookie.
+- [x] Generate non-guessing game.
 
 ### How to Play
 Seriously !?
@@ -83,23 +84,25 @@ const game = Minesweeper();
 ```
 
 #### `Minesweepr::reset(rows, cols, mines, quickMode)`:
-Clear the game board and reset the config settings.
+Clear the game board and reset the config settings. Return `blocks`.
 
 #### `Minesweepr::init(rows, cols, mines, quickMode, exclude)`:
-Reset and start the game. The `exclude` take an array of `BlockRecord` to exclude from being mine.
+Reset and start the game. The `exclude` take an array of `BlockRecord` to exclude from being mine. Return `blocks`.
 
 #### `Minesweeper::singleClick(BlockRecord)`:
-Perform a single click on a block. Set a flag if `mode` === `quick`, else reveal the block.
+Perform a single click on a block. Set a flag if `mode` === `quick`, else reveal the block. Return a Promise with `blocks` as argument.
 
 #### `Minesweeper::rightClick(BlockRecord)`:
-Perform a right click on a block. Reveal the block if `mode` === `quick`, else set a flag.
+Perform a right click on a block. Reveal the block if `mode` === `quick`, else set a flag. Return a Promise with `blocks` as argument.
 
 ### TODO
 
 - [ ] Record high score.
 - [x] Cleverly first click init.
 - [ ] Mobile friendly.
-- [ ] Game solver (_hard_, for non-guessing game).
+- [x] Game solver (_hard_, for non-guessing game).
+- [ ] Completely switch to Immutable.js.
+- [ ] Increase solver speed.
 
 ### Contribute
 Issues, PRs, and all the advise and discussion are very welcome!
@@ -107,6 +110,7 @@ Issues, PRs, and all the advise and discussion are very welcome!
 ### Special Thanks
 
 - [muan/emoji](https://github.com/muan/emoji): Great cross-platform emoji collection!
+- [Solving Minesweeper with Matrices By Robert Massaioli](https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/): Awesome and inspiring minesweeper solver algorithm.
 
 ### License
 [MIT](./LICENSE)
