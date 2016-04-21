@@ -1,4 +1,4 @@
-import Immutable, { Map, Record, OrderedMap, List, Range } from 'immutable';
+import Immutable, { Map, Record, List, Range } from 'immutable';
 import { EventEmitter } from 'events';
 import rref from './rref';
 
@@ -9,7 +9,7 @@ export const Block = Record({
     hidden: true,
     flag: false
 });
-const Blocks = Map;
+export const Blocks = Map;
 
 Blocks.prototype.getSurrounding = function(record) {
     return this.filter( (block, r) => (
@@ -94,28 +94,6 @@ const RNG = ({
             return random.push(random.get(r)).delete(r);
         }, Range(start, end).toList().filterNot(n => exclude.includes(n)))
         .takeLast(number)
-);
-
-const randomNumberGenerator = ({
-    start = 0,
-    end,
-    number = 1,
-    exclude = List()
-}) => (
-    new Array(number)
-        .fill(0)
-        .map( (cur, index) => index )
-        .reduce( (random, index) => {
-            let r = Math.floor(Math.random() * (random.length - index));
-            random.push(random[r]);
-            random.splice(r, 1);
-            return random;
-        }, new Array(end - start)
-            .fill(0)
-            .map( (cur, index) => index )
-            .filter(cur => !exclude.includes(cur))
-        )
-        .slice(-number)
 );
 
 const Minesweeper = () => ({
@@ -335,20 +313,12 @@ const Minesweeper = () => ({
     },
 
 
-    // getEdgeBlockRecord: function(blocks) {
-    //     return blocks.keySeq()
-    //         .toArray()
-    //         .filter(key => blocks.get(key).type === "normal" && blocks.get(key).mines && !blocks.get(key).hidden)
-    //         .filter(record => blocks.getSurrounding(record).some(
-    //             r => blocks.get(r).hidden && !blocks.get(r).flag
-    //         ));
-    // },
     getEdgeBlockRecord: function(blocks) {
         return blocks
-            .filter( (block, record)  => block.type === "normal" && block.mines && !block.hidden)
-            .filter( (block, record) => blocks.getSurrounding(record).some(
-                r => blocks.get(r).hidden && !blocks.get(r).flag
-            ));
+            .filter( (block, record) => block.type === "normal" && block.mines && !block.hidden)
+            .filter( (block, record) =>
+                blocks.getSurrounding(record).some(b => b.hidden && !b.flag)
+            );
     },
     solveByRref: function(blocks, edges) {
         return new Promise(
@@ -359,29 +329,28 @@ const Minesweeper = () => ({
                  */
                 let changed = false;
 
-                // const edges = this.getEdgeBlockRecord(blocks);
-                const edgeBlocks = blocks.filter( (block, record) => block.hidden);
+                const edgeBlocks = blocks.filter(block => block.hidden).keySeq().toList();
 
                 const matrix = edges.map( (block, edge) => {
                     const hiddenBlock = blocks.getSurrounding(edge)
-                        .filter(record => blocks.get(record).hidden && !blocks.get(record).flag);
+                        .filter(b => b.hidden && !b.flag);
                     return edgeBlocks.map(unknown => (
-                        hiddenBlock.find(h => Immutable.is(h, unknown)) ? 1 : 0
-                    )).concat([
-                        blocks.get(edge).mines - blocks.getSurrounding(edge).filter(record => blocks.get(record).hidden && blocks.get(record).flag).size
-                    ]);
-                });
+                        hiddenBlock.find( (b, r) => Immutable.is(r, unknown)) ? 1 : 0
+                    )).toList().push(
+                        block.mines - blocks.getSurrounding(edge).filter(b => b.hidden && b.flag).size
+                    );
+                }).toList();
 
-                const remainBlocks = blocks.toKeyedSeq().filter( (block, record) => block.hidden && !block.flag );
+                const remainBlocks = blocks.filter(block => block.hidden && !block.flag).keySeq().toList();
 
-                const remainCondition = [
+                const remainCondition = List([
                     ...edgeBlocks.map(record =>
-                        remainBlocks.find( (block, r) => Immutable.is(record, r) ) ? 1 : 0
+                        remainBlocks.find(r => Immutable.is(record, r) ) ? 1 : 0
                     ),
                     this.mines - blocks.filter(block => block.flag && block.hidden).size
-                ];
+                ]);
 
-                const rrefMatrix = rref(matrix.concat([remainCondition]));
+                const rrefMatrix = rref(matrix.push(remainCondition));
 
                 const bounds = rrefMatrix.map(row =>
                     row.slice(0, row.size - 1)
@@ -401,12 +370,12 @@ const Minesweeper = () => ({
                             .forEach( (col, i) => {
                                 if (col === boundCondition) {
                                     // console.log('flag', edgeBlocks[i]);
-                                    blocks = blocks.update(edgeBlocks[i], b => b.set("flag", true));
+                                    blocks = blocks.update(edgeBlocks.get(i), b => b.set("flag", true));
                                     changed = true;
                                 }
                                 else if (col === -boundCondition) {
                                     // console.log('reveal', edgeBlocks[i]);
-                                    blocks = blocks.revealBlock(edgeBlocks[i]);
+                                    blocks = blocks.revealBlock(edgeBlocks.get(i));
                                     changed = true;
                                 }
                             });
@@ -440,10 +409,10 @@ const Minesweeper = () => ({
                 // set flag to those satisfy the mines number
                 edges.forEach( (block, record) => {
                     const surroundingHidden = blocks.getSurrounding(record)
-                        .filter(r => blocks.get(r).hidden);
+                        .filter(b => b.hidden);
 
                     if (block.mines === surroundingHidden.size) {
-                        surroundingHidden.forEach(r => {
+                        surroundingHidden.forEach( (b, r) => {
                             blocks = blocks.update(
                                 r,
                                 b => b.set("flag", true)
@@ -457,9 +426,9 @@ const Minesweeper = () => ({
                 edges.forEach( (block, record) => {
                     const surrounding = blocks.getSurrounding(record);
 
-                    if (surrounding.filter(r => blocks.get(r).hidden && blocks.get(r).flag).size === block.mines) {
-                        surrounding.filter(r => blocks.get(r).hidden && !blocks.get(r).flag)
-                            .forEach(r => {
+                    if (surrounding.filter(b => b.hidden && b.flag).size === block.mines) {
+                        surrounding.filter(b => b.hidden && !b.flag)
+                            .forEach( (b, r) => {
                                 blocks = blocks.revealBlock(r);
                             });
                         changed = true;
@@ -469,13 +438,13 @@ const Minesweeper = () => ({
                 if (changed) {
                     setTimeout(() => {
                         resolve(this.solver(blocks));
-                    });
+                    }, 0);
                 }
                 else {
                     if (!blocks.checkGame()) {
                         setTimeout(() => {
                             resolve(this.solveByRref(blocks, edges));
-                        });
+                        }, 0);
                     }
                     else {
                         resolve(true);
