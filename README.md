@@ -103,6 +103,7 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 - [x] Game solver (_hard_, for non-guessing game).
 - [ ] Completely switch to Immutable.js.
 - [ ] Increase solver speed.
+- [ ] Cover up loading screen.
 
 ### Contribute
 Issues, PRs, and all the advise and discussion are very welcome!
