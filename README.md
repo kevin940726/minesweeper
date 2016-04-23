@@ -104,6 +104,7 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 - [ ] Completely switch to Immutable.js.
 - [ ] Increase solver speed.
 - [x] Cover up loading screen.
+- [ ] Write some tests.
 
 ### Contribute
 Issues, PRs, and all the advise and discussion are very welcome!
