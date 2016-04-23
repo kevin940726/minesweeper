@@ -39,6 +39,15 @@ const style = {
 		filter: "blur(5px)"
 	},
 
+	loadingBackground: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		height: "100%",
+		width: "100%"
+	},
 	loadingIcon: {
 		display: "block",
 		fontFamily: "'AppleColorEmoji', 'Roboto', sans-serif",
@@ -71,6 +80,7 @@ Row = Radium(Row);
 let LoadingWrapper = ({ isLoading, children }) => (
 	<div style={[ style.loading, isLoading && style.isLoading ]}>
 		{children}
+		<div style={[isLoading && style.loadingBackground]}></div>
 	</div>
 );
 LoadingWrapper = Radium(LoadingWrapper);
@@ -89,6 +99,7 @@ const Weeper = ({ rows, cols, isLoading }) => (
 			))}
 			<ConfigBar />
 			<ConfigPanel />
+			{ isLoading && (<LoadingIcon />) }
 		</LoadingWrapper>
 		{ isLoading && (<LoadingIcon />) }
 	</div>
