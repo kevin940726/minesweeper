@@ -11,7 +11,7 @@ const style = {
 		left: "50%",
 		transform: "translate(-50%, -50%)",
 		boxShadow: "0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)",
-		padding: "30px 20px",
+		padding: "40px",
 		backgroundColor: "#FFF",
 		zIndex: "-1",
 		opacity: "0",
@@ -108,7 +108,7 @@ const ConfigPanel = ({ show, rows, cols, mines, flagMode, checkIsSolvable, saveC
 				<input key="flagMode" type="checkbox" onChange={e => toggleFlagMode()} style={{display: 'none'}} checked={flagMode}></input>
 			</label>
 			<label key="checkIsSolvableLabel" style={[ style.label, style.checkbox ]}>
-				{checkIsSolvable ? (<span className={hasFont() || "emoji s_robot"}>🤖</span>) : <span className={hasFont() || "emoji s_hand"}>✋</span>}
+				{checkIsSolvable ? (<span className={hasFont() || "emoji s_grey_question"}>❔</span>) : <span className={hasFont() || "emoji s_question"}>❓</span>}
 				<input key="checkIsSolvable" type="checkbox" onChange={e => toggleCheckIsSolvable()} style={{display: 'none'}} checked={checkIsSolvable}></input>
 			</label>
 			<div style={style.line}></div>
