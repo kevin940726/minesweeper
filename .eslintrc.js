@@ -16,23 +16,16 @@ module.exports = {
         "react"
     ],
     "rules": {
-        "indent": [
-            0,
-            "tab"
-        ],
+        "indent": 0,
         "linebreak-style": [
-            0,
+            1,
             "unix"
         ],
-        "quotes": [
-            0,
-            "double"
-        ],
         "semi": [
-            2,
+            1,
             "always"
         ],
-        "no-unused-vars": 0,
+        "quotes": 0,
         "no-console": 0
     }
 };

@@ -9,8 +9,6 @@ The most complete minesweeper game built with React, Redux and Immutable.js.
 
 ### Features
 
-**Working Progress...**
-
 - [x] Custom game board and three different major difficulty.
 - [x] Counting Time.
 - [x] Mines left.
@@ -60,7 +58,10 @@ const BlockRecord = Record({
 });
 ```
 
-#### `Minesweepr()`:
+#### `Blocks`:
+An immutable Map represent the whole game board blocks, with `BlockRecord` as keys and `Block` as values.
+
+#### `Minesweeper()`:
 Create the game board, load initial data. There are some game data you can get:
 
 - `rows`: _(Int)_ Game board rows.
@@ -77,16 +78,17 @@ Create the game board, load initial data. There are some game data you can get:
 - `mode`: _(String)_
 	* `regular`: Regular game mode. Single click to reveal the block, right click to set a flag.
 	* `quick`: Quick mode. Single click to set a flag, while right click will reveal the block.
-- `flagMode`: _(Boolean)_ Quick mode for the game or not
+- `flagMode`: _(Boolean)_ Quick mode for the game or not.
+- `checkIsSolvable`: _(Boolean)_ Generate non-guessing game or not.
 
 ```js
 const game = Minesweeper();
 ```
 
-#### `Minesweepr::reset(rows, cols, mines, quickMode)`:
+#### `Minesweeper::reset(rows, cols, mines, quickMode)`:
 Clear the game board and reset the config settings. Return `blocks`.
 
-#### `Minesweepr::init(rows, cols, mines, quickMode, exclude)`:
+#### `Minesweeper::init(rows, cols, mines, quickMode, exclude)`:
 Reset and start the game. The `exclude` take an array of `BlockRecord` to exclude from being mine. Return `blocks`.
 
 #### `Minesweeper::singleClick(BlockRecord)`:

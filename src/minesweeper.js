@@ -9,8 +9,11 @@ export const Block = Record({
     hidden: true,
     flag: false
 });
+/* create an instance of Immutable Map, append it's prototype. */
 export const Blocks = Map;
 
+/* get surrounding blocks, return a Map containing surrounding
+   blocks except itself. */
 Blocks.prototype.getSurrounding = function(record) {
     return this.filter( (block, r) => (
         Math.abs(r.row - record.row) <= 1 &&
@@ -19,6 +22,8 @@ Blocks.prototype.getSurrounding = function(record) {
     ));
 };
 
+/* initial the 'mines' of surrounding block of mine.
+   return blocks. */
 Blocks.prototype.initSurrounding = function(record) {
     const block = this.get(record);
     return this.update(
@@ -27,11 +32,13 @@ Blocks.prototype.initSurrounding = function(record) {
     );
 };
 
+/* open the blocks and the surrounding blocks recursively */
 Blocks.prototype.revealBlock = function(blockRecord, revealMineCallback) {
-    // click on normal hidden block
+    // if click on mine, game lose, reveal all the mines.
     if (this.get(blockRecord).type === 'mine') {
         return revealMineCallback();
     }
+    // click on normal hidden block
     else {
         let blocks = this.update(
             blockRecord,
@@ -50,6 +57,7 @@ Blocks.prototype.revealBlock = function(blockRecord, revealMineCallback) {
     }
 };
 
+/* click on number, expand the surrounding blocks recursively */
 Blocks.prototype.expandBlock = function(blockRecord, revealMineCallback) {
     const block = this.get(blockRecord);
     let blocks = this;
@@ -65,6 +73,7 @@ Blocks.prototype.expandBlock = function(blockRecord, revealMineCallback) {
     return blocks;
 };
 
+/* set a flag on the block */
 Blocks.prototype.setFlag = function(blockRecord) {
     return this.update(
         blockRecord,
@@ -72,6 +81,7 @@ Blocks.prototype.setFlag = function(blockRecord) {
     );
 };
 
+/* check if this blocks is game over */
 Blocks.prototype.checkGame = function() {
     if (this.filter(block => block.type === "normal")
             .every(block => !block.hidden)
@@ -82,6 +92,7 @@ Blocks.prototype.checkGame = function() {
     return false;
 };
 
+/* random number generator */
 const RNG = ({
     start = 0,
     end,
@@ -96,37 +107,27 @@ const RNG = ({
         .takeLast(number)
 );
 
+/* main class */
 const Minesweeper = () => ({
-    rows: 9,
-    cols: 9,
-    mines: 10,
-    minesRemaining: 10,
-    blocks: Blocks(),
-    status: "ready",
-    timePass: 0,
-    mode: "regular",
-    flagMode: false,
-    checkIsSolvable: false,
-
     _timer: null,
     _eventEmitter: new EventEmitter(),
     on: function(event, callback) {
         return this._eventEmitter.on(event, callback);
     },
 
-
+    /* reset the game board */
     reset: function(rows, cols, mines, flagMode, checkIsSolvable) {
         // reset variables
-        this.rows = rows || this.rows;
-        this.cols = cols || this.cols;
-        this.mines = mines || this.mines;
+        this.rows = rows || 9;
+        this.cols = cols || 9;
+        this.mines = mines || 10;
         this.minesRemaining = this.mines;
         this.blocks = Blocks();
         this.status = "ready";
         this.timePass = 0;
         this.mode = "regular";
-        this.flagMode = flagMode || this.flagMode;
-        this.checkIsSolvable = checkIsSolvable || this.checkIsSolvable;
+        this.flagMode = flagMode || false;
+        this.checkIsSolvable = checkIsSolvable || false;
         clearInterval(this._timer);
         this._eventEmitter.emit("statuschanged", this.status);
 
@@ -145,6 +146,7 @@ const Minesweeper = () => ({
         return blocks;
     },
 
+    /* initialize the game */
     init: function(rows, cols, mines, flagMode, exclude = Map()) {
         let blocks = this.reset(rows, cols, mines, flagMode);
 
@@ -170,6 +172,7 @@ const Minesweeper = () => ({
         return blocks;
     },
 
+    /* gameover, and reveal all the mines */
     revealMine: function() {
         this.status = "lose";
         this._eventEmitter.emit("statuschanged", this.status);
@@ -190,6 +193,8 @@ const Minesweeper = () => ({
 
         return blocks;
     },
+
+    /* reveal the block */
     clickOn: function(blockRecord) {
         let blocks = this.blocks;
 
@@ -258,6 +263,7 @@ const Minesweeper = () => ({
         return Promise.resolve(blocks);
     },
 
+    /* set flag to a block */
     rightClickOn: function(blockRecord) {
         let blocks = this.blocks;
         const block = blocks.get(blockRecord);
@@ -276,6 +282,9 @@ const Minesweeper = () => ({
         return Promise.resolve(blocks);
     },
 
+    /* perform single click,
+       reveal block for regular mode,
+       set flag for quick mode */
     singleClick: function(blockRecord) {
         if (this.status !== "win" && this.status !== "lose") {
             if (this.mode === "regular") {
@@ -288,6 +297,9 @@ const Minesweeper = () => ({
 
         return Promise.resolve(this.blocks);
     },
+    /* perform right click,
+       reveal block for quick mode,
+       set flag for regular mode */
     rightClick: function(blockRecord) {
         if (this.status !== "win" && this.status !== "lose") {
             if (this.mode === "regular") {
@@ -301,6 +313,7 @@ const Minesweeper = () => ({
         return Promise.resolve(this.blocks);
     },
 
+    /* check if game is over, emit the event */
     checkGame: function(blocks) {
         if (blocks.checkGame()) {
             this.status = "win";
@@ -313,16 +326,20 @@ const Minesweeper = () => ({
     },
 
 
+    /* --------------------- SOLVER --------------------- */
+
+    /* get all the revealed blocks with number > 0
+       and have surrounding hidden blocks */
     getEdgeBlockRecord: function(blocks) {
         return blocks
-            .filter( (block, record) => block.type === "normal" && block.mines && !block.hidden)
+            .filter(block => block.type === "normal" && block.mines && !block.hidden)
             .filter( (block, record) =>
                 blocks.getSurrounding(record).some(b => b.hidden && !b.flag)
             );
     },
     solveByRref: function(blocks, edges) {
         return new Promise(
-            (resolve, reject) => {
+            resolve => {
                 /*
                  *  inspired by the great article by @ROBERT MASSAIOLI
                  *  https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/
@@ -399,10 +416,9 @@ const Minesweeper = () => ({
         );
     },
 
-
     solver: function(blocks) {
         return new Promise(
-            (resolve, reject) => {
+            resolve => {
                 const edges = this.getEdgeBlockRecord(blocks);
                 let changed = false;
 
