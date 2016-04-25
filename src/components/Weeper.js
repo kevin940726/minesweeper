@@ -5,6 +5,7 @@ import ConfigBar from '../containers/ConfigBar';
 import ConfigPanel from '../containers/ConfigPanel';
 import { BlockRecord } from '../minesweeper';
 import Radium from 'radium';
+import hasFont from '../hasAppleColorEmoji';
 
 const style = {
 	base: {
@@ -86,7 +87,7 @@ let LoadingWrapper = ({ isLoading, children }) => (
 LoadingWrapper = Radium(LoadingWrapper);
 
 let LoadingIcon = ({ isLoading }) => (
-	<span style={style.loadingIcon}>⏳</span>
+	<span className={hasFont() || "emoji s_hourglass_flowing_sand"} style={style.loadingIcon}>⏳</span>
 );
 LoadingIcon = Radium(LoadingIcon);
 
