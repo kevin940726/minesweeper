@@ -1,5 +1,4 @@
 import { handleActions } from 'redux-actions';
-import { BlockRecord, Block } from '../minesweeper';
 
 const reducers = handleActions({
 	SET_GAME: (state, action) => ({
@@ -18,7 +17,7 @@ const reducers = handleActions({
 		}
 	}),
 
-	TOGGLE_MODE: (state, action) => {
+	TOGGLE_MODE: (state) => {
 		state.mw.mode = state.mw.mode === "regular" ? "quick" : "regular";
 
 		return {

@@ -147,8 +147,8 @@ const Minesweeper = () => ({
     },
 
     /* initialize the game */
-    init: function(rows, cols, mines, flagMode, exclude = Map()) {
-        let blocks = this.reset(rows, cols, mines, flagMode);
+    init: function(rows, cols, mines, flagMode, checkIsSolvable, exclude = Map()) {
+        let blocks = this.reset(rows, cols, mines, flagMode, checkIsSolvable);
 
         exclude = exclude.keySeq().map(record => record.row * this.cols + record.col);
 
@@ -202,7 +202,7 @@ const Minesweeper = () => ({
         if (this.status === "ready") {
             const exclude = blocks.getSurrounding(blockRecord).set(blockRecord, blocks.get(blockRecord));
 
-            blocks = this.init(this.rows, this.cols, this.mines, this.flagMode, exclude);
+            blocks = this.init(this.rows, this.cols, this.mines, this.flagMode, this.checkIsSolvable, exclude);
             if (this.checkIsSolvable) {
                 return this.solver(blocks.revealBlock(blockRecord))
                     .then(solved => {
