@@ -103,10 +103,11 @@ Perform a right click on a block. Reveal the block if `mode` === `quick`, else s
 - [x] Cleverly first click init.
 - [ ] Mobile friendly.
 - [x] Game solver (_hard_, for non-guessing game).
-- [ ] Completely switch to Immutable.js.
+- [x] Completely switch to Immutable.js.
 - [ ] Increase solver speed.
 - [x] Cover up loading screen.
 - [ ] Write some tests.
+- [ ] Generate hints by solver.
 
 ### Contribute
 Issues, PRs, and all the advise and discussion are very welcome!
